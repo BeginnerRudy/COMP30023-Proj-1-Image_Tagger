@@ -105,7 +105,6 @@ int main(int argc, char **argv)
 	 // NEW!!!
 	newsockfd = accept(	sockfd, (struct sockaddr *) &cli_addr,
 						&clilen);
-	while (1){
 		// handle open new socket failure
 		if (newsockfd < 0)
 		{
@@ -113,6 +112,7 @@ int main(int argc, char **argv)
 			exit(1);
 		}
 
+	while (1){
 		// initialize each value of the buffer to 0
 		bzero(buffer,256);
 
@@ -128,14 +128,15 @@ int main(int argc, char **argv)
 			exit(1);
 		}
 
-		if (strncmp(buffer, TERMINATION, 17) != 0){
-			printf("=====TCP Connection Closed=====\n");
-			break;
-		}
 
 		// Display the client request on terminal's screen
 		printf("Here is the message: %s\n",buffer);
 
+		if (strncmp(buffer, TERMINATION, 17) == 0){
+				printf("=====TCP Connection Closed=====\n");
+				break;
+		}
+		
 		char modified_message[n];
 		for (int i = 0; i < n; i++){
 			modified_message[i] = toupper(buffer[i]);
