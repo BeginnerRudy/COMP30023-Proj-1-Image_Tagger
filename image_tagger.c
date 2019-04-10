@@ -110,7 +110,7 @@ int main(int argc, char **argv){
 
       // Writing HTML response message
       write(connection_sockfd_1, "HTTP/1.1 200 OK\n", 16);
-      write(connection_sockfd_1, "Content-length: 151\n", 19);
+      write(connection_sockfd_1, "Content-length: 600\n", 19);
       write(connection_sockfd_1, "Content-Type: text/html\n\n", 25);
 
       // directly copy data from the file to the socket
