@@ -1,4 +1,5 @@
-#include "http_request.h"
+#include "handle_http_request.h"
+
 bool handle_http_request(int sockfd)
 {
     // try to read the request
@@ -50,13 +51,14 @@ bool handle_http_request(int sockfd)
             // get the size of the file
             struct stat st;
             stat(HOME_PAGE, &st);
-            n = sprintf(buff, HTTP_200_FORMAT, st.st_size);
+            n = sprintf(buff, HTTP_200_FORMAT, st.st_size, 0);
             // send the header first
             if (write(sockfd, buff, n) < 0)
             {
                 perror("write");
                 return false;
             }
+
             // send the file
             int filefd = open(HOME_PAGE, O_RDONLY);
             do
