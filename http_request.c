@@ -16,6 +16,10 @@ bool handle_http_request(int sockfd)
     // terminate the string
     buff[n] = 0;
 
+    // display the HTTP request message
+    printf("player %d sends a request:\n", sockfd);
+    printf("%s\n", buff);
+
     char * curr = buff;
 
     // parse the method
@@ -40,7 +44,7 @@ bool handle_http_request(int sockfd)
     while (*curr == '.' || *curr == '/')
         ++curr;
     // assume the only valid request URI is "/" but it can be modified to accept more files
-    if (*curr == ' ')
+    if (*curr == ' '){
         if (method == GET)
         {
             // get the size of the file
@@ -118,6 +122,7 @@ bool handle_http_request(int sockfd)
         else
             // never used, just for completeness
             fprintf(stderr, "no other methods supported");
+    }
     // send 404
     else if (write(sockfd, HTTP_404, HTTP_404_LENGTH) < 0)
     {

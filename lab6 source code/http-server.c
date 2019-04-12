@@ -217,6 +217,7 @@ int main(int argc, char * argv[])
 
     while (1)
     {
+      printf("+++++++++++++++++++++++++++++++++++++++++++++\n");
         // monitor file descriptors
         fd_set readfds = masterfds;
         if (select(FD_SETSIZE, &readfds, NULL, NULL, NULL) < 0)

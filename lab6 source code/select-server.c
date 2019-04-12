@@ -31,6 +31,8 @@ int main(int argc, char * argv[])
 
     // reuse the socket if possible
     int const reuse = 1;
+    //int setsockopt(int socket, int level, int option_name,
+    //   const void *option_value, socklen_t option_len);
     if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(int)) < 0)
     {
         perror("setsockopt");

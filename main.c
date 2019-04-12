@@ -118,14 +118,22 @@ void http_server(fd_set masterfds, int *maxfd, int welcoming_sockfd){
     printf("++++++++++++++++++++++++++++Round %d+++++++++++++++++++++++++\n", count++);
       // monitor file descriptors
       fd_set readfds = masterfds;
-      my_select(&readfds);
+      if (select(FD_SETSIZE, &readfds, NULL, NULL, NULL) < 0)
+      {
+          perror("select");
+          exit(EXIT_FAILURE);
+      }
 
       // loop all possible descriptor
       for (int i = 0; i <= *maxfd; ++i){
           // determine if the current file descriptor is active
+          printf("Welcoming socket id is %d\n", welcoming_sockfd);
           if (FD_ISSET(i, &readfds)){
+              printf("%d\n", i);
+
               // create new socket if there is new incoming connection request
               if (i == welcoming_sockfd){
+                printf("WWWWWWWWWWelcome!\n");
                 three_way_handshaking(welcoming_sockfd, &masterfds, maxfd);
               }
               // a request is sent from the client
@@ -140,6 +148,8 @@ void http_server(fd_set masterfds, int *maxfd, int welcoming_sockfd){
 }
 
 int main(int argc, char **argv){
+
+
   int welcoming_sockfd,   // The fd for welcoming socket
       port_no;// The port number for this server would running on
 
