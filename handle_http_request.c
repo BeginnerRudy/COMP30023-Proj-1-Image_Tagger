@@ -1,19 +1,65 @@
 #include "handle_http_request.h"
 
+bool send_page_to_user(char* page_to_sent, char* buff, int n, int sockfd){
+    // get the size of the file
+    struct stat st;
+    stat(page_to_sent, &st);
+    n = sprintf(buff, HTTP_200_FORMAT_WITH_COOKIE, st.st_size, 0);
+    // send the header first
+    if (write(sockfd, buff, n) < 0)
+    {
+        perror("write");
+        return false;
+    }
+
+    // send the file
+    int filefd = open(page_to_sent, O_RDONLY);
+    do
+    {
+        n = sendfile(sockfd, filefd, NULL, 2048);
+    }
+    while (n > 0);
+    if (n < 0)
+    {
+        perror("sendfile");
+        close(filefd);
+        return false;
+    }
+    close(filefd);
+}
+
+int is_GET_HOME_PAGE(char* curr){
+    if (strncmp(curr, "/ ",2) == 0){
+        return 1;
+    }
+    return 0;
+}
+
+int is_GET_GAME_PLAYING_PAGE(char* curr){
+    if (strncmp(curr, "/?start=Start", 13) == 0){
+        return 1;
+    }
+    return 0;
+}
+
+int is_GET_FAV_ICON(char* curr){
+    if (strncmp(curr, "/favicon.ico", 12) == 0){
+        return 1;
+    }
+    return 0;
+}
+
+int is_QUIT(){}
+
+int is_SUBMIT_Username(){}
+
+int is_GUESS_Keyword(){}
+
 bool handle_http_request(int sockfd)
 {
     // try to read the request
     char buff[2049];
     int n = read(sockfd, buff, 2049);
-    if (n <= 0)
-    {
-        if (n < 0)
-            perror("read");
-        else
-            printf("socket %d close the connection\n", sockfd);
-        return false;
-    }
-
     // terminate the string
     buff[n] = 0;
 
@@ -41,38 +87,29 @@ bool handle_http_request(int sockfd)
         return false;
     }
 
-    // sanitise the URI
-    while (*curr == '.' || *curr == '/')
-        ++curr;
+
     // assume the only valid request URI is "/" but it can be modified to accept more files
-    if (*curr == ' '){
+    if (1){
         if (method == GET)
         {
-            // get the size of the file
-            struct stat st;
-            stat(HOME_PAGE, &st);
-            n = sprintf(buff, HTTP_200_FORMAT_WITH_COOKIE, st.st_size, 0);
-            // send the header first
-            if (write(sockfd, buff, n) < 0)
-            {
-                perror("write");
-                return false;
+            char* page_to_sent;
+            // GET HOME_PAGE
+            if (is_GET_HOME_PAGE(curr)){
+                page_to_sent = (char*)malloc(sizeof(HOME_PAGE));
+                strncpy(page_to_sent, HOME_PAGE, HOME_PAGE_PATH_LENGTH);
+            // GET GAME_PLAYING_PAGE
+            }else if(is_GET_GAME_PLAYING_PAGE(curr)){
+                page_to_sent = (char*)malloc(sizeof(GAME_PLAYING_PAGE));
+                strncpy(page_to_sent, GAME_PLAYING_PAGE, GAME_PLAYING_PAGE_PATH_LENGTH);
+            }else if(is_GET_FAV_ICON(curr)){
+                page_to_sent = (char*)malloc(sizeof(FAV_ICON));
+                strncpy(page_to_sent, FAV_ICON, FAV_ICON_PATH_LENGTH);
             }
 
-            // send the file
-            int filefd = open(HOME_PAGE, O_RDONLY);
-            do
-            {
-                n = sendfile(sockfd, filefd, NULL, 2048);
-            }
-            while (n > 0);
-            if (n < 0)
-            {
-                perror("sendfile");
-                close(filefd);
-                return false;
-            }
-            close(filefd);
+            printf("%s\n", page_to_sent);
+            // send the page which the client request to client
+            send_page_to_user(page_to_sent, buff, n, sockfd);
+            free(page_to_sent);
         }
         else if (method == POST)
         {
