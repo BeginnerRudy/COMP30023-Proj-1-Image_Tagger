@@ -51,7 +51,7 @@ bool handle_http_request(int sockfd)
             // get the size of the file
             struct stat st;
             stat(HOME_PAGE, &st);
-            n = sprintf(buff, HTTP_200_FORMAT, st.st_size, 0);
+            n = sprintf(buff, HTTP_200_FORMAT_WITH_COOKIE, st.st_size, 0);
             // send the header first
             if (write(sockfd, buff, n) < 0)
             {
