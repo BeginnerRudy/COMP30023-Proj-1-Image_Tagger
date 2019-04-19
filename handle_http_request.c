@@ -1,10 +1,10 @@
 #include "handle_http_request.h"
 
-bool send_page_to_user(char* page_to_sent, char* buff, int n, int sockfd){
+bool send_page_to_user(char* page_to_sent, char* buff, int n, int sockfd, int num_bit_add){
     // get the size of the file
     struct stat st;
     stat(page_to_sent, &st);
-    n = sprintf(buff, HTTP_200_FORMAT_WITH_COOKIE, st.st_size, 0);
+    n = sprintf(buff, HTTP_200_FORMAT_WITH_COOKIE, st.st_size + num_bit_add, 0);
     // send the header first
     if (write(sockfd, buff, n) < 0)
     {
@@ -124,62 +124,47 @@ bool handle_http_request(int sockfd)
 
             printf("%s\n", page_to_sent);
             // send the page which the client request to client
-            send_page_to_user(page_to_sent, buff, n, sockfd);
+            send_page_to_user(page_to_sent, buff, n, sockfd, NOTHING_TO_ADD);
             free(page_to_sent);
         }
         else if (method == POST)
         {
             // quit POST
             if (is_QUIT(buff)){
+                send_page_to_user(GAME_OVER_PAGE, buff, n, sockfd, NOTHING_TO_ADD);
+                close(sockfd);
             // username POST
             }else if(is_SUBMIT_Username(buff)){
                 // locate the username, it is safe to do so in this sample code, but usually the result is expected to be
                 // copied to another buffer using strcpy or strncpy to ensure that it will not be overwritten.
                 char * username = strstr(buff, "user=") + 5;
                 int username_length = strlen(username);
-                // the length needs to include the ", " before the username
-                long added_length = username_length + 2;
+                int len_of_thing_to_add = username_length + 4;
 
-                // get the size of the file
-                struct stat st;
-                stat(MAIN_PAGE, &st);
-                // increase file size to accommodate the username
-                long size = st.st_size + added_length;
-                n = sprintf(buff, HTTP_200_FORMAT, size);
-                // send the header first
-                if (write(sockfd, buff, n) < 0)
+
+
+                // send the modified Main Page
+                send_page_to_user(MAIN_PAGE, buff, n, sockfd, len_of_thing_to_add);
+                // Add username into the main page
+                if (write(sockfd, "<p/>", 4) < 0)
                 {
                     perror("write");
                     return false;
                 }
-                // read the content of the HTML file
-                int filefd = open(MAIN_PAGE, O_RDONLY);
-                n = read(filefd, buff, 2048);
-                if (n < 0)
-                {
-                    perror("read");
-                    close(filefd);
-                    return false;
-                }
-                close(filefd);
-                // move the trailing part backward
-                int p1, p2;
-                for (p1 = size - 1, p2 = p1 - added_length; p1 >= size - 25; --p1, --p2)
-                    buff[p1] = buff[p2];
-                ++p2;
-                // put the separator
-                buff[p2++] = ',';
-                buff[p2++] = ' ';
-                // copy the username
-                strncpy(buff + p2, username, username_length);
-                if (write(sockfd, buff, size) < 0)
+
+                if (write(sockfd, username, username_length) < 0)
                 {
                     perror("write");
                     return false;
                 }
+
             // keyword POST
             }else if(is_GUESS_Keyword(buff)){
+                // keyword accepted
+                // keyword discard
+                // game completed
 
+                send_page_to_user(KEYWORD_ACCEPTED_PAGE, buff, n, sockfd, NOTHING_TO_ADD);
             }
 
         }

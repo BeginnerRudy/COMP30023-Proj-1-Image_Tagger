@@ -1,3 +1,2 @@
-cookie
-string entered
-is_compeleted
+// keywords
+// is_quit

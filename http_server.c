@@ -1,6 +1,11 @@
 #include "http_server.h"
 
 void http_server(int argc, char* argv[]){
+
+
+    //Cookie, username
+    
+
   int welcoming_sockfd,   // The fd for welcoming socket
       port_no;// The port number for this server would running on
 
