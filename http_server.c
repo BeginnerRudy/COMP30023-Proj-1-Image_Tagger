@@ -40,6 +40,7 @@ void http_server(int argc, char* argv[]){
     // running the http Server
     handle_all_incoming_request(masterfds, &maxfd, welcoming_sockfd, cookie_set);
 
+    free(cookie_set->cookies);
     free(cookie_set);
 }
 
