@@ -78,6 +78,14 @@ int is_GUESS_Keyword(char* buff){
     return 0;
 }
 
+int does_contain_cookie(char* buff){
+    if (strstr(buff, "Cookie: ") != NULL){
+        return 1;
+    }
+    return 0;
+}
+
+
 bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
 {
     // try to read the request
@@ -119,9 +127,17 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
             bool does_send_cookie;
             // GET HOME_PAGE
             if (is_GET_HOME_PAGE(curr)){
-                page_to_sent = (char*)malloc(sizeof(HOME_PAGE));
-                strncpy(page_to_sent, HOME_PAGE, HOME_PAGE_PATH_LENGTH);
-                does_send_cookie = SEND_COOKIE;
+                // The user has no cookie
+                if (!does_contain_cookie(buff)){
+                    page_to_sent = (char*)malloc(sizeof(HOME_PAGE));
+                    strncpy(page_to_sent, HOME_PAGE, HOME_PAGE_PATH_LENGTH);
+                    does_send_cookie = SEND_COOKIE;
+                // The user does have cookie
+                }else{
+                    page_to_sent = (char*)malloc(sizeof(MAIN_PAGE));
+                    strncpy(page_to_sent, MAIN_PAGE, MAIN_PAGE_PATH_LENGTH);
+                    does_send_cookie = NOT_SEND_COOKIE;
+                }
             // GET GAME_PLAYING_PAGE
             }else if(is_GET_GAME_PLAYING_PAGE(curr)){
                 page_to_sent = (char*)malloc(sizeof(GAME_PLAYING_PAGE));
