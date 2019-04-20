@@ -40,3 +40,10 @@ void update_memory_of_cookie_set(cookie_set_t* cookie_set, int next_cookie_id){
             cookie_set->max_size*sizeof(cookie_t*));
     }
 }
+
+int is_valid_cookie(cookie_set_t* cookie_set, int cookie){
+    if (cookie < cookie_set->curr_size){
+        return 1;
+    }
+    return 0;
+}

@@ -87,8 +87,9 @@ int is_GUESS_Keyword(char* buff){
     return 0;
 }
 
-int does_contain_cookie(char* buff){
-    if (strstr(buff, "Cookie: ") != NULL){
+int does_contain_cookie(char* buff, cookie_set_t* cookie_set){
+    if (strstr(buff, "Cookie: ") != NULL &&
+    is_valid_cookie(cookie_set, atoi(get_cookie(buff)))){
         return 1;
     }
     return 0;
@@ -163,7 +164,7 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
             // GET HOME_PAGE
             if (is_GET_HOME_PAGE(curr)){
                 // The user has no cookie
-                if (!does_contain_cookie(buff)){
+                if (!does_contain_cookie(buff, cookie_set)){
                     page_to_sent = (char*)malloc(sizeof(HOME_PAGE));
                     strncpy(page_to_sent, HOME_PAGE, HOME_PAGE_PATH_LENGTH);
                     does_send_cookie = true;
