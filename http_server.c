@@ -4,10 +4,8 @@ void http_server(int argc, char* argv[]){
 
 
     //Cookie, username initilization
-    cookie_set_t *cookie_set = (cookie_set_t*)malloc(sizeof(cookie_set_t*));
-    cookie_set->curr_size = 0;
-    cookie_set->max_size = INITIAL_MAX_COOKIE_NUM;
-    cookie_set->cookies = (cookie_t*)malloc(INITIAL_MAX_COOKIE_NUM*sizeof(cookie_t*));
+    cookie_set_t *cookie_set;
+    cookie_set = create_cookie_set();
 
     int welcoming_sockfd,   // The fd for welcoming socket
       port_no;// The port number for this server would running on
