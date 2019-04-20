@@ -1,17 +1,6 @@
 #include "handle_http_request.h"
 
-bool send_page_to_user(char* page_to_sent, char* buff, int n, int sockfd, int num_bit_add, bool does_send_cookie){
-    // get the size of the file
-    struct stat st;
-    stat(page_to_sent, &st);
-
-    // response with Set-cookie
-    if (does_send_cookie){
-        n = sprintf(buff, HTTP_200_FORMAT_WITH_COOKIE, st.st_size + num_bit_add, 0);
-    // response without Set-cookie
-    }else{
-        n = sprintf(buff, HTTP_200_FORMAT, st.st_size + num_bit_add, 0);
-    }
+bool send_body(int sockfd, char* buff, int n, char* page_to_sent){
     // send the header first
     if (write(sockfd, buff, n) < 0)
     {
@@ -33,6 +22,26 @@ bool send_page_to_user(char* page_to_sent, char* buff, int n, int sockfd, int nu
         return false;
     }
     close(filefd);
+    return true;
+}
+
+bool send_page_to_user_with_cookie(char* page_to_sent, char* buff,
+    int n, int sockfd, int num_bit_add, int cookie_id){
+    // get the size of the file
+    struct stat st;
+    stat(page_to_sent, &st);
+    n = sprintf(buff, HTTP_200_FORMAT_WITH_COOKIE, st.st_size + num_bit_add, cookie_id);
+    send_body(sockfd, buff, n, page_to_sent);
+    return true;
+}
+
+bool send_page_to_user_no_cookie(char* page_to_sent, char* buff,
+    int n, int sockfd, int num_bit_add){
+    // get the size of the file
+    struct stat st;
+    stat(page_to_sent, &st);
+    n = sprintf(buff, HTTP_200_FORMAT, st.st_size + num_bit_add);
+    send_body(sockfd, buff, n, page_to_sent);
     return true;
 }
 
@@ -85,6 +94,32 @@ int does_contain_cookie(char* buff){
     return 0;
 }
 
+char* get_cookie(char* buff){
+    if (strstr(buff, "Cookie: ") != NULL){
+        printf("The Cookie is not null\n");
+        char * cookie_curr_pt = strstr(buff, "Cookie: ") + 8;
+        char* cookie_id = (char*)malloc(sizeof(char*));
+        int curr_size = 0;
+        int max_size = 1;
+
+
+        while (strcmp(cookie_curr_pt, "\n") != 0){
+            // check whether to expand memory
+            if (curr_size == max_size){
+                max_size *= 2;
+                cookie_id = realloc(cookie_id, max_size*sizeof(char*));
+            }
+
+            cookie_id[curr_size++] = *cookie_curr_pt;
+            cookie_curr_pt++;
+        }
+        cookie_id[curr_size] = '\0';
+        printf("The cookie is %s\n", cookie_id);
+        return cookie_id;
+    }
+    return NULL;
+}
+
 
 bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
 {
@@ -124,41 +159,69 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
         if (method == GET)
         {
             char* page_to_sent;
-            bool does_send_cookie;
+            bool does_send_cookie = false;
             // GET HOME_PAGE
             if (is_GET_HOME_PAGE(curr)){
                 // The user has no cookie
                 if (!does_contain_cookie(buff)){
                     page_to_sent = (char*)malloc(sizeof(HOME_PAGE));
                     strncpy(page_to_sent, HOME_PAGE, HOME_PAGE_PATH_LENGTH);
-                    does_send_cookie = SEND_COOKIE;
+                    does_send_cookie = true;
                 // The user does have cookie
                 }else{
                     page_to_sent = (char*)malloc(sizeof(MAIN_PAGE));
                     strncpy(page_to_sent, MAIN_PAGE, MAIN_PAGE_PATH_LENGTH);
-                    does_send_cookie = NOT_SEND_COOKIE;
                 }
             // GET GAME_PLAYING_PAGE
             }else if(is_GET_GAME_PLAYING_PAGE(curr)){
                 page_to_sent = (char*)malloc(sizeof(GAME_PLAYING_PAGE));
                 strncpy(page_to_sent, GAME_PLAYING_PAGE, GAME_PLAYING_PAGE_PATH_LENGTH);
-                does_send_cookie = NOT_SEND_COOKIE;
             }else if(is_GET_FAV_ICON(curr)){
                 page_to_sent = (char*)malloc(sizeof(FAV_ICON));
                 strncpy(page_to_sent, FAV_ICON, FAV_ICON_PATH_LENGTH);
-                does_send_cookie = NOT_SEND_COOKIE;
             }
 
-            printf("%s\n", page_to_sent);
             // send the page which the client request to client
-            send_page_to_user(page_to_sent, buff, n, sockfd, NOTHING_TO_ADD, does_send_cookie);
+            if (does_send_cookie == true){
+                int next_cookie_id = cookie_set->curr_size;
+                // Send HTTP header along with cookie to player
+                send_page_to_user_with_cookie(page_to_sent, buff, n, sockfd,
+                     NOTHING_TO_ADD, next_cookie_id);
+                // Add this cookie to the cookie set,
+                //this function handles dynamic array
+                add_cookie(cookie_set);
+
+            }else if (strcmp(page_to_sent, MAIN_PAGE) == 0){
+                int curr_cookie = atoi(get_cookie(buff));
+                char* username = find_username(cookie_set, curr_cookie);
+                int username_length = strlen(username);
+                int len_of_thing_to_add = username_length + 4;
+                send_page_to_user_no_cookie(page_to_sent, buff, n, sockfd,
+                 len_of_thing_to_add);
+                 // Add username into the main page
+                 if (write(sockfd, "<p/>", 4) < 0)
+                 {
+                     perror("write");
+                     return false;
+                 }
+
+                 if (write(sockfd, username, username_length) < 0)
+                 {
+                     perror("write");
+                     return false;
+                 }
+            }else{
+                send_page_to_user_no_cookie(page_to_sent, buff, n, sockfd,
+                     NOTHING_TO_ADD);
+            }
             free(page_to_sent);
         }
         else if (method == POST)
         {
             // quit POST
             if (is_QUIT(buff)){
-                send_page_to_user(GAME_OVER_PAGE, buff, n, sockfd, NOTHING_TO_ADD, NOT_SEND_COOKIE);
+                send_page_to_user_no_cookie(GAME_OVER_PAGE, buff, n, sockfd,
+                    NOTHING_TO_ADD);
                 close(sockfd);
             // username POST
             }else if(is_SUBMIT_Username(buff)){
@@ -168,10 +231,18 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
                 int username_length = strlen(username);
                 int len_of_thing_to_add = username_length + 4;
 
-
+                // store the username along with cookie ID
+                if (get_cookie(buff) == NULL){
+                    printf("No cookie provided\n");
+                }else{
+                    int curr_cookie = atoi(get_cookie(buff));
+                    add_username(cookie_set, curr_cookie, username);
+                }
+                // add_username(cookie_set, curr_cookie, username);
 
                 // send the modified Main Page
-                send_page_to_user(MAIN_PAGE, buff, n, sockfd, len_of_thing_to_add, NOT_SEND_COOKIE);
+                send_page_to_user_no_cookie(MAIN_PAGE, buff, n, sockfd,
+                    len_of_thing_to_add);
                 // Add username into the main page
                 if (write(sockfd, "<p/>", 4) < 0)
                 {
@@ -191,7 +262,8 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
                 // keyword discard
                 // game completed
 
-                send_page_to_user(KEYWORD_ACCEPTED_PAGE, buff, n, sockfd, NOTHING_TO_ADD, NOT_SEND_COOKIE);
+                send_page_to_user_no_cookie(KEYWORD_ACCEPTED_PAGE, buff, n, sockfd,
+                    NOTHING_TO_ADD);
             }
 
         }
