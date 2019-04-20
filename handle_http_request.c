@@ -78,7 +78,7 @@ int is_GUESS_Keyword(char* buff){
     return 0;
 }
 
-bool handle_http_request(int sockfd)
+bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
 {
     // try to read the request
     char buff[2049];
