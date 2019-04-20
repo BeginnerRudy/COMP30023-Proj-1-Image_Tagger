@@ -97,7 +97,6 @@ int does_contain_cookie(char* buff, cookie_set_t* cookie_set){
 
 char* get_cookie(char* buff){
     if (strstr(buff, "Cookie: ") != NULL){
-        printf("The Cookie is not null\n");
         char * cookie_curr_pt = strstr(buff, "Cookie: ") + 8;
         char* cookie_id = (char*)malloc(sizeof(char*));
         int curr_size = 0;
@@ -115,7 +114,9 @@ char* get_cookie(char* buff){
             cookie_curr_pt++;
         }
         cookie_id[curr_size] = '\0';
-        printf("The cookie is %s\n", cookie_id);
+        printf("========================================================\n");
+        printf("The cookie I get is :%s\n", cookie_id);
+        printf("========================================================\n");
         return cookie_id;
     }
     return NULL;
@@ -190,7 +191,9 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
                      NOTHING_TO_ADD, next_cookie_id);
                 // Add this cookie to the cookie set,
                 //this function handles dynamic array
+                printf("start to new cookie %d\n", cookie_set->curr_size);
                 add_cookie(cookie_set);
+                printf("add new cookie %d successfully\n", cookie_set->curr_size - 1);
 
             }else if (strcmp(page_to_sent, MAIN_PAGE) == 0){
                 int curr_cookie = atoi(get_cookie(buff));
@@ -228,16 +231,18 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
             }else if(is_SUBMIT_Username(buff)){
                 // locate the username, it is safe to do so in this sample code, but usually the result is expected to be
                 // copied to another buffer using strcpy or strncpy to ensure that it will not be overwritten.
-                char * username = strstr(buff, "user=") + 5;
-                int username_length = strlen(username);
-                int len_of_thing_to_add = username_length + 4;
+                char * name = strstr(buff, "user=") + 5;
+                int name_length = strlen(name);
+                int len_of_thing_to_add = name_length + 4;
 
                 // store the username along with cookie ID
                 if (get_cookie(buff) == NULL){
                     printf("No cookie provided\n");
                 }else{
                     int curr_cookie = atoi(get_cookie(buff));
-                    add_username(cookie_set, curr_cookie, username);
+                    printf("The cookie I got now is %d\n", curr_cookie);
+                    printf("The username I got is %s\n", name);
+                    add_username(cookie_set, curr_cookie, name);
                 }
                 // add_username(cookie_set, curr_cookie, username);
 
@@ -251,7 +256,7 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
                     return false;
                 }
 
-                if (write(sockfd, username, username_length) < 0)
+                if (write(sockfd, name, name_length) < 0)
                 {
                     perror("write");
                     return false;
@@ -279,5 +284,7 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
         return false;
     }
 
+    printf("Current max size is %d\n", cookie_set->max_size);
+    print_all_cookies(cookie_set);
     return true;
 }
