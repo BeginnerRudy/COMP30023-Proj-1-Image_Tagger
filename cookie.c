@@ -23,6 +23,9 @@ void add_username(cookie_set_t* cookie_set, int cookie_id, char* username){
     strncpy(cookie_set->cookies[cookie_id].username,
             username,
             strlen(username));
+    int last_char_index = strlen(cookie_set->cookies[cookie_id].username);
+    char* the_username = cookie_set->cookies[cookie_id].username;
+    the_username[last_char_index] = '\0';
 }
 
 void add_cookie(cookie_set_t* cookie_set){
