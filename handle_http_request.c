@@ -226,7 +226,7 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
             if (is_QUIT(buff)){
                 send_page_to_user_no_cookie(GAME_OVER_PAGE, buff, n, sockfd,
                     NOTHING_TO_ADD);
-                close(sockfd);
+                return false;
             // username POST
             }else if(is_SUBMIT_Username(buff)){
                 // locate the username, it is safe to do so in this sample code, but usually the result is expected to be
