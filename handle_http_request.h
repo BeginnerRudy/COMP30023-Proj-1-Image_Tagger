@@ -58,3 +58,8 @@ int is_SUBMIT_Username(char* buff);
 int is_GUESS_Keyword(char* buff);
 int does_contain_cookie(char* buff, cookie_set_t* cookie_set);
 char* get_cookie(char* buff);
+
+
+char* prepare_html_format(int* n, char* page_to_send, const char* string,...);
+bool send_html_format(char* page_to_send, char* buff,
+    int n, int sockfd, const char* string,...);
