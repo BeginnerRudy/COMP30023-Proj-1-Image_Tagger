@@ -43,10 +43,10 @@ char* prepare_html_format(int* n, char* page_to_send, const char* string,...){
 }
 
 bool send_html_format(char* page_to_send, char* buff,
-    int n, int sockfd, const char* string,...){
+    int sockfd, const char* string,...){
     int len_html;
     char* html = prepare_html_format(&len_html, page_to_send, string);
-    n = sprintf(buff, HTTP_200_FORMAT, len_html);
+    int n = sprintf(buff, HTTP_200_FORMAT, len_html);
     // send the header first
     if(!mysendfile(sockfd, buff, n)){
         return false;
@@ -58,10 +58,10 @@ bool send_html_format(char* page_to_send, char* buff,
     return true;
 }
 
-bool send_html(char* page_to_send, char* buff, int n, int sockfd){
+bool send_html(char* page_to_send, char* buff, int sockfd){
     char* html = my_readfile(page_to_send);
     int len_html = strlen(html);
-    n = sprintf(buff, HTTP_200_FORMAT, len_html);
+    int n = sprintf(buff, HTTP_200_FORMAT, len_html);
     // send the header first
     if(!mysendfile(sockfd, buff, n)){
         return false;
@@ -73,11 +73,11 @@ bool send_html(char* page_to_send, char* buff, int n, int sockfd){
     return true;
 }
 
-bool send_html_with_cookie(char* page_to_send, char* buff, int n, int sockfd,
+bool send_html_with_cookie(char* page_to_send, char* buff, int sockfd,
     int cookie_id){
     char* html = my_readfile(page_to_send);
     int len_html = strlen(html);
-    n = sprintf(buff, HTTP_200_FORMAT_WITH_COOKIE, len_html, cookie_id);
+    int n = sprintf(buff, HTTP_200_FORMAT_WITH_COOKIE, len_html, cookie_id);
     // send the header first
     if(!mysendfile(sockfd, buff, n)){
         return false;

@@ -54,16 +54,16 @@ bool is_socket_closed(int n, int sockfd){
     return false;
 }
 
-bool parse_method(char* curr, METHOD* method, int sockfd){
+bool parse_method(char** curr, METHOD* method, int sockfd){
     // parse the method
-    if (strncmp(curr, "GET ", 4) == 0)
+    if (strncmp(*curr, "GET ", 4) == 0)
     {
-        curr += 4;
+        *curr += 4;
         *method = GET;
     }
-    else if (strncmp(curr, "POST ", 5) == 0)
+    else if (strncmp(*curr, "POST ", 5) == 0)
     {
-        curr += 5;
+        *curr += 5;
         *method = POST;
     }
     else if (write(sockfd, HTTP_400, HTTP_400_LENGTH) < 0)
@@ -73,6 +73,7 @@ bool parse_method(char* curr, METHOD* method, int sockfd){
     }
     return true;
 }
+
 
 bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
 {
@@ -86,37 +87,16 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
         return false;
     }
 
-
-
-    // display the HTTP request message
-    printf("player %d sends a request:\n", sockfd);
-    printf("%s\n", buff);
-
     char * curr = buff;
+    char** ptr = &curr;
     METHOD method = UNKNOWN;
 
-    // parse the method
-    if (strncmp(curr, "GET ", 4) == 0)
-    {
-        curr += 4;
-        method = GET;
-    }
-    else if (strncmp(curr, "POST ", 5) == 0)
-    {
-        curr += 5;
-        method = POST;
-    }
-    else if (write(sockfd, HTTP_400, HTTP_400_LENGTH) < 0)
-    {
-        perror("write");
+    if (!parse_method(ptr, &method, sockfd)){
+        printf("Parsing Error \n");
         return false;
     }
 
-    // if (!parse_method(curr, &method, sockfd)){
-    //     printf("Parsing S........\n");
-    //     printf("Parsing........\n");
-    //     return false;
-    // }
+
     // assume the only valid request URI is "/" but it can be modified to accept more files
     if (method == GET){
         if (is_GET_HOME_PAGE(curr)){
@@ -124,7 +104,7 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
             if (!does_contain_cookie(buff, cookie_set)){
                 int next_cookie_id = cookie_set->curr_size;
                 // Send HTTP header along with cookie to player
-                send_html_with_cookie(HOME_PAGE, buff, n, sockfd, next_cookie_id);
+                send_html_with_cookie(HOME_PAGE, buff, sockfd, next_cookie_id);
                 // Add this cookie to the cookie set,
                 //this function handles dynamic array
 
@@ -133,10 +113,10 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
             }else{
                 int curr_cookie = atoi(get_cookie(buff));
                 char* username = find_username(cookie_set, curr_cookie);
-                send_html_format(MAIN_PAGE, buff, n, sockfd, username);
+                send_html_format(MAIN_PAGE, buff, sockfd, username);
             }
         }else if(is_GET_GAME_PLAYING_PAGE(curr)){
-            send_html(GAME_PLAYING_PAGE, buff, n, sockfd);
+            send_html(GAME_PLAYING_PAGE, buff, sockfd);
         }else if(is_GET_FAV_ICON(curr)){
             send_fav_icon(FAV_ICON, sockfd);
         }else{
@@ -144,7 +124,7 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
         }
     }else if(method == POST){
         if(is_QUIT(buff)){
-            send_html(GAME_OVER_PAGE, buff, n, sockfd);
+            send_html(GAME_OVER_PAGE, buff, sockfd);
             return false;
         }else if(is_SUBMIT_Username(buff)){
             // locate the username, it is safe to do so in this sample code, but usually the result is expected to be
@@ -167,13 +147,13 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
             printf("Add username into cookie successfully\n");
 
             // send the modified Main Page
-            send_html_format(MAIN_PAGE, buff, n, sockfd, name);
+            send_html_format(MAIN_PAGE, buff, sockfd, name);
         }else if(is_GUESS_Keyword(buff)){
             // keyword accepted
             // keyword discard
             // game completed
 
-            send_html(KEYWORD_ACCEPTED_PAGE, buff, n, sockfd);
+            send_html(KEYWORD_ACCEPTED_PAGE, buff, sockfd);
         }else{
             send_404(sockfd);
         }

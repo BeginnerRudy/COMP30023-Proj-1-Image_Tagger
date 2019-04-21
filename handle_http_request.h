@@ -28,4 +28,4 @@ int is_QUIT(char* buff);
 int is_SUBMIT_Username(char* buff);
 int is_GUESS_Keyword(char* buff);
 bool is_socket_closed(int n, int sockfd);
-bool parse_method(char* curr, METHOD* method, int sockfd);
+bool parse_method(char** curr, METHOD* method, int sockfd);

@@ -41,7 +41,6 @@ void update_memory_of_cookie_set(cookie_set_t* cookie_set, int next_cookie_id){
         cookie_set->max_size *= 2;
         cookie_set->cookies
         = realloc(cookie_set->cookies, cookie_set->max_size * sizeof(cookie_t));
-        printf("Realloc successful\n" );
         for (int i = cookie_set->max_size/2; i < cookie_set->max_size; i++){
             cookie_set->cookies[i].username = NULL;
         }
@@ -88,9 +87,7 @@ char* get_cookie(char* buff){
         int curr_size = 0;
         int max_size = 1;
 
-        printf("Start to get cookie\n");
         while (!isdigit(*cookie_curr_pt)){
-            printf("%s\n", cookie_curr_pt);
             // check whether to expand memory
             if (curr_size == max_size){
                 max_size *= 2;
@@ -101,9 +98,6 @@ char* get_cookie(char* buff){
             cookie_curr_pt++;
         }
         cookie_id[curr_size] = '\0';
-        printf("========================================================\n");
-        printf("The cookie I get is :%s\n", cookie_id);
-        printf("========================================================\n");
         return cookie_id;
     }
     return NULL;
