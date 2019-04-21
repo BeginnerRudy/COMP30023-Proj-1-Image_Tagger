@@ -148,8 +148,7 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
             if (does_send_cookie == true){
                 int next_cookie_id = cookie_set->curr_size;
                 // Send HTTP header along with cookie to player
-                send_page_to_user_with_cookie(page_to_send, buff, n, sockfd,
-                     NOTHING_TO_ADD, next_cookie_id);
+                send_html_with_cookie(page_to_send, buff, n, sockfd,next_cookie_id);
                 // Add this cookie to the cookie set,
                 //this function handles dynamic array
                 printf("start to new cookie %d\n", cookie_set->curr_size);
@@ -172,8 +171,7 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
         {
             // quit POST
             if (is_QUIT(buff)){
-                send_page_to_user_no_cookie(GAME_OVER_PAGE, buff, n, sockfd,
-                    NOTHING_TO_ADD);
+                send_html(GAME_OVER_PAGE, buff, n, sockfd);
                 return false;
             // username POST
             }else if(is_SUBMIT_Username(buff)){
@@ -206,8 +204,7 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
                 // keyword discard
                 // game completed
 
-                send_page_to_user_no_cookie(KEYWORD_ACCEPTED_PAGE, buff, n, sockfd,
-                    NOTHING_TO_ADD);
+                send_html(KEYWORD_ACCEPTED_PAGE, buff, n, sockfd);
             }
 
         }

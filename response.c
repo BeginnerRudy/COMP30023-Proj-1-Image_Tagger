@@ -21,6 +21,15 @@ char* my_readfile(char* page_to_send){
     return buffer;
 }
 
+bool mysendfile(int sockfd, char* buff, int n){
+    if (write(sockfd, buff, n) < 0)
+    {
+        perror("write");
+        return false;
+    }
+    return true;
+}
+
 char* prepare_html_format(int* n, char* page_to_send, const char* string,...){
     char* html = (char*)malloc(2049*sizeof(char));
 
@@ -40,26 +49,42 @@ bool send_html_format(char* page_to_send, char* buff,
     char* html = prepare_html_format(&len_html, page_to_send, string);
     n = sprintf(buff, HTTP_200_FORMAT, len_html);
     // send the header first
-    if (write(sockfd, buff, n) < 0)
-    {
-        perror("write");
+    if(!mysendfile(sockfd, buff, n)){
         return false;
     }
-    printf("%s\n", buff);
     // send the body then
-    if (write(sockfd, html, len_html) < 0)
-    {
-        perror("write");
+    if(!mysendfile(sockfd, html, len_html)){
         return false;
     }
-    printf("%s\n", html);
     return true;
 }
 
-bool mysendfile(int sockfd, char* buff, int n){
-    if (write(sockfd, buff, n) < 0)
-    {
-        perror("write");
+bool send_html(char* page_to_send, char* buff, int n, int sockfd){
+    char* html = my_readfile(page_to_send);
+    int len_html = strlen(html);
+    n = sprintf(buff, HTTP_200_FORMAT, len_html);
+    // send the header first
+    if(!mysendfile(sockfd, buff, n)){
+        return false;
+    }
+    // send the body then
+    if(!mysendfile(sockfd, html, len_html)){
+        return false;
+    }
+    return true;
+}
+
+bool send_html_with_cookie(char* page_to_send, char* buff, int n, int sockfd,
+    int cookie_id){
+    char* html = my_readfile(page_to_send);
+    int len_html = strlen(html);
+    n = sprintf(buff, HTTP_200_FORMAT_WITH_COOKIE, len_html, cookie_id);
+    // send the header first
+    if(!mysendfile(sockfd, buff, n)){
+        return false;
+    }
+    // send the body then
+    if(!mysendfile(sockfd, html, len_html)){
         return false;
     }
     return true;

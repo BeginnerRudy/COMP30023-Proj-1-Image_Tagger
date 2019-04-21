@@ -53,3 +53,6 @@ bool send_page_to_user_no_cookie(char* page_to_sent,
 bool send_body(int sockfd, char* buff,
     int n, char* page_to_sent);
 bool mysendfile(int sockfd, char* buff, int n);
+bool send_html(char* page_to_send, char* buff, int n, int sockfd);
+bool send_html_with_cookie(char* page_to_send, char* buff, int n, int sockfd,
+    int cookie_id);
