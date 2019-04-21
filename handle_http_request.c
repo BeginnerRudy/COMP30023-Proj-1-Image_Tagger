@@ -102,8 +102,9 @@ char* get_cookie(char* buff){
         int curr_size = 0;
         int max_size = 1;
 
-
-        while (strcmp(cookie_curr_pt, "\n") != 0){
+        printf("Start to get cookie\n");
+        while (!isdigit(*cookie_curr_pt)){
+            printf("%s\n", cookie_curr_pt);
             // check whether to expand memory
             if (curr_size == max_size){
                 max_size *= 2;
@@ -136,7 +137,7 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
             printf("socket %d close the connection\n", sockfd);
         return false;
     }
-    
+
     // terminate the string
     buff[n] = 0;
 
@@ -247,16 +248,20 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
                 int name_length = strlen(name);
                 int len_of_thing_to_add = name_length + 4;
 
+                get_cookie(buff);
+                printf("get_cookie() successfully\n");
+
                 // store the username along with cookie ID
                 if (get_cookie(buff) == NULL){
                     printf("No cookie provided\n");
                 }else{
+                    printf("Cookie provided.\n");
                     int curr_cookie = atoi(get_cookie(buff));
                     printf("The cookie I got now is %d\n", curr_cookie);
                     printf("The username I got is %s\n", name);
                     add_username(cookie_set, curr_cookie, name);
                 }
-                // add_username(cookie_set, curr_cookie, username);
+                printf("Add username into cookie successfully\n");
 
                 // send the modified Main Page
                 send_page_to_user_no_cookie(MAIN_PAGE, buff, n, sockfd,
