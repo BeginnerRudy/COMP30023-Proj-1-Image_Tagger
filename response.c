@@ -1,8 +1,6 @@
 #include "response.h"
 
-char* prepare_html_format(int* n, char* page_to_send, const char* string,...){
-    char* html = (char*)malloc(2049*sizeof(char));
-
+char* my_readfile(char* page_to_send){
     char * buffer = 0;
     long length;
     FILE * f = fopen (page_to_send, "rb");
@@ -19,6 +17,14 @@ char* prepare_html_format(int* n, char* page_to_send, const char* string,...){
       }
       fclose (f);
     }
+
+    return buffer;
+}
+
+char* prepare_html_format(int* n, char* page_to_send, const char* string,...){
+    char* html = (char*)malloc(2049*sizeof(char));
+
+    char * buffer = my_readfile(page_to_send);
 
     if (buffer)
     {
@@ -50,6 +56,14 @@ bool send_html_format(char* page_to_send, char* buff,
     return true;
 }
 
+bool mysendfile(int sockfd, char* buff, int n){
+    if (write(sockfd, buff, n) < 0)
+    {
+        perror("write");
+        return false;
+    }
+    return true;
+}
 
 bool send_body(int sockfd, char* buff, int n, char* page_to_send){
     // send the header first

@@ -41,6 +41,7 @@ typedef enum
 
 #define NOTHING_TO_ADD 0
 
+char* my_readfile(char* page_to_send);
 char* prepare_html_format(int* n, char* page_to_send, const char* string,...);
 bool send_html_format(char* page_to_send, char* buff,
     int n, int sockfd, const char* string,...);
@@ -51,3 +52,4 @@ bool send_page_to_user_no_cookie(char* page_to_sent,
     char* buff, int n, int sockfd, int num_bit_add);
 bool send_body(int sockfd, char* buff,
     int n, char* page_to_sent);
+bool mysendfile(int sockfd, char* buff, int n);
