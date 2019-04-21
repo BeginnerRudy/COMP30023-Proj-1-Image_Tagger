@@ -3,7 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#define INITIAL_MAX_COOKIE_NUM 1000
+#define INITIAL_MAX_COOKIE_NUM 2
 #define MAX_USERNAME_LEN 20
 typedef struct{
     int cookie; // The cookie identifier

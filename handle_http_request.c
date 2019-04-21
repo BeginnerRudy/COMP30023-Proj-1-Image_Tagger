@@ -304,6 +304,6 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
     }
 
     printf("Current max size is %d\n", cookie_set->max_size);
-    // print_all_cookies(cookie_set);
+    print_all_cookies(cookie_set);
     return true;
 }

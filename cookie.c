@@ -42,6 +42,9 @@ void update_memory_of_cookie_set(cookie_set_t* cookie_set, int next_cookie_id){
         cookie_set->cookies
         = realloc(cookie_set->cookies, cookie_set->max_size * sizeof(cookie_t));
         printf("Realloc successful\n" );
+        for (int i = cookie_set->max_size/2; i < cookie_set->max_size; i++){
+            cookie_set->cookies[i].username = NULL;
+        }
     }
 }
 
