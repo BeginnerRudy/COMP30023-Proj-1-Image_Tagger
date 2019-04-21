@@ -42,68 +42,60 @@ int is_GUESS_Keyword(char* buff){
     return 0;
 }
 
-int does_contain_cookie(char* buff, cookie_set_t* cookie_set){
-    if (strstr(buff, "Cookie: ") != NULL &&
-    is_valid_cookie(cookie_set, atoi(get_cookie(buff)))){
-        return 1;
-    }
-    return 0;
-}
-
-char* get_cookie(char* buff){
-    if (strstr(buff, "Cookie: ") != NULL){
-        char * cookie_curr_pt = strstr(buff, "Cookie: ") + 8;
-        char* cookie_id = (char*)malloc(sizeof(char));
-        int curr_size = 0;
-        int max_size = 1;
-
-        printf("Start to get cookie\n");
-        while (!isdigit(*cookie_curr_pt)){
-            printf("%s\n", cookie_curr_pt);
-            // check whether to expand memory
-            if (curr_size == max_size){
-                max_size *= 2;
-                cookie_id = realloc(cookie_id, max_size*sizeof(char));
-            }
-
-            cookie_id[curr_size++] = *cookie_curr_pt;
-            cookie_curr_pt++;
-        }
-        cookie_id[curr_size] = '\0';
-        printf("========================================================\n");
-        printf("The cookie I get is :%s\n", cookie_id);
-        printf("========================================================\n");
-        return cookie_id;
-    }
-    return NULL;
-}
-
-
-bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
-{
-    // try to read the request
-    char buff[2049];
-    int n = read(sockfd, buff, 2049);
+bool is_socket_closed(int n, int sockfd){
     if (n <= 0)
     {
         if (n < 0)
             perror("read");
         else
             printf("socket %d close the connection\n", sockfd);
+        return true;
+    }
+    return false;
+}
+
+bool parse_method(char* curr, METHOD* method, int sockfd){
+    // parse the method
+    if (strncmp(curr, "GET ", 4) == 0)
+    {
+        curr += 4;
+        *method = GET;
+    }
+    else if (strncmp(curr, "POST ", 5) == 0)
+    {
+        curr += 5;
+        *method = POST;
+    }
+    else if (write(sockfd, HTTP_400, HTTP_400_LENGTH) < 0)
+    {
+        perror("write");
+        return false;
+    }
+    return true;
+}
+
+bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
+{
+    // try to read the request
+    char buff[2049];
+    int n = read(sockfd, buff, 2049);
+    // terminate the string
+    buff[n] = 0;
+
+    if (is_socket_closed(n, sockfd)){
         return false;
     }
 
-    // terminate the string
-    buff[n] = 0;
+
 
     // display the HTTP request message
     printf("player %d sends a request:\n", sockfd);
     printf("%s\n", buff);
 
     char * curr = buff;
+    METHOD method = UNKNOWN;
 
     // parse the method
-    METHOD method = UNKNOWN;
     if (strncmp(curr, "GET ", 4) == 0)
     {
         curr += 4;
@@ -120,7 +112,11 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
         return false;
     }
 
-
+    // if (!parse_method(curr, &method, sockfd)){
+    //     printf("Parsing S........\n");
+    //     printf("Parsing........\n");
+    //     return false;
+    // }
     // assume the only valid request URI is "/" but it can be modified to accept more files
     if (1){
         if (method == GET)

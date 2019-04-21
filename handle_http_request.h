@@ -27,5 +27,5 @@ int is_GET_FAV_ICON(char* curr);
 int is_QUIT(char* buff);
 int is_SUBMIT_Username(char* buff);
 int is_GUESS_Keyword(char* buff);
-int does_contain_cookie(char* buff, cookie_set_t* cookie_set);
-char* get_cookie(char* buff);
+bool is_socket_closed(int n, int sockfd);
+bool parse_method(char* curr, METHOD* method, int sockfd);

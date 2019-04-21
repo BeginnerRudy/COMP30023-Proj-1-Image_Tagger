@@ -73,3 +73,38 @@ void print_all_cookies(cookie_set_t* cookie_set){
     }
     printf("Print all cookies successfully\n");
 }
+int does_contain_cookie(char* buff, cookie_set_t* cookie_set){
+    if (strstr(buff, "Cookie: ") != NULL &&
+    is_valid_cookie(cookie_set, atoi(get_cookie(buff)))){
+        return 1;
+    }
+    return 0;
+}
+
+char* get_cookie(char* buff){
+    if (strstr(buff, "Cookie: ") != NULL){
+        char * cookie_curr_pt = strstr(buff, "Cookie: ") + 8;
+        char* cookie_id = (char*)malloc(sizeof(char));
+        int curr_size = 0;
+        int max_size = 1;
+
+        printf("Start to get cookie\n");
+        while (!isdigit(*cookie_curr_pt)){
+            printf("%s\n", cookie_curr_pt);
+            // check whether to expand memory
+            if (curr_size == max_size){
+                max_size *= 2;
+                cookie_id = realloc(cookie_id, max_size*sizeof(char));
+            }
+
+            cookie_id[curr_size++] = *cookie_curr_pt;
+            cookie_curr_pt++;
+        }
+        cookie_id[curr_size] = '\0';
+        printf("========================================================\n");
+        printf("The cookie I get is :%s\n", cookie_id);
+        printf("========================================================\n");
+        return cookie_id;
+    }
+    return NULL;
+}

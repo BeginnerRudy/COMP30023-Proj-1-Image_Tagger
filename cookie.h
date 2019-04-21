@@ -25,3 +25,5 @@ void update_memory_of_cookie_set(cookie_set_t* cookie_set,
 void add_cookie(cookie_set_t* cookie_set);
 int is_valid_cookie(cookie_set_t* cookie_set, int cookie);
 void print_all_cookies(cookie_set_t* cookie_set);
+int does_contain_cookie(char* buff, cookie_set_t* cookie_set);
+char* get_cookie(char* buff);
