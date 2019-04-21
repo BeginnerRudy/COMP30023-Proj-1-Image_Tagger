@@ -56,3 +56,5 @@ bool mysendfile(int sockfd, char* buff, int n);
 bool send_html(char* page_to_send, char* buff, int n, int sockfd);
 bool send_html_with_cookie(char* page_to_send, char* buff, int n, int sockfd,
     int cookie_id);
+bool send_fav_icon(char* page_to_send, int sockfd);
+bool send_404(int sockfd);

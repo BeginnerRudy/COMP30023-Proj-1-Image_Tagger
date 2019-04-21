@@ -17,7 +17,6 @@ char* my_readfile(char* page_to_send){
       }
       fclose (f);
     }
-
     return buffer;
 }
 
@@ -85,6 +84,46 @@ bool send_html_with_cookie(char* page_to_send, char* buff, int n, int sockfd,
     }
     // send the body then
     if(!mysendfile(sockfd, html, len_html)){
+        return false;
+    }
+    return true;
+}
+
+bool send_fav_icon(char* page_to_send, int sockfd){
+    // get the size of the file
+    struct stat st;
+    stat(page_to_send, &st);
+    char buff[2049];
+    int n = sprintf(buff, HTTP_200_FORMAT, st.st_size);
+    send_body(sockfd, buff, n, page_to_send);
+    // send the header first
+    if (write(sockfd, buff, n) < 0)
+    {
+        perror("write");
+        return false;
+    }
+
+    // send the file
+    int filefd = open(page_to_send, O_RDONLY);
+    do
+    {
+        n = sendfile(sockfd, filefd, NULL, 2048);
+    }
+    while (n > 0);
+    if (n < 0)
+    {
+        perror("sendfile");
+        close(filefd);
+        return false;
+    }
+    close(filefd);
+    return true;
+}
+
+bool send_404(int sockfd){
+    if (write(sockfd, HTTP_404, HTTP_404_LENGTH) < 0)
+    {
+        perror("write");
         return false;
     }
     return true;
