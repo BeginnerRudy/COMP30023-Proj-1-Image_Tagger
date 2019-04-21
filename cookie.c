@@ -34,15 +34,6 @@ void add_cookie(cookie_set_t* cookie_set){
     update_memory_of_cookie_set(cookie_set, next_cookie_id);
     cookie_set->cookies[next_cookie_id].cookie = next_cookie_id;
     cookie_set->curr_size += 1;
-    for (int i=0; i < cookie_set->max_size; i++){
-        printf("The address of cookie_set->cookies[%d] is %ld\n",
-         i, (cookie_set->cookies[i]));
-    }
-
-    for (int i=0; i < cookie_set->max_size; i++){
-        printf("The address of cookie_set->cookies[%d].username is %ld\n",
-         i, (cookie_set->cookies[i].username));
-    }
 }
 
 void update_memory_of_cookie_set(cookie_set_t* cookie_set, int next_cookie_id){

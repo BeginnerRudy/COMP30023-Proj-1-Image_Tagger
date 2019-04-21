@@ -128,6 +128,15 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
     // try to read the request
     char buff[2049];
     int n = read(sockfd, buff, 2049);
+    if (n <= 0)
+    {
+        if (n < 0)
+            perror("read");
+        else
+            printf("socket %d close the connection\n", sockfd);
+        return false;
+    }
+    
     // terminate the string
     buff[n] = 0;
 
@@ -200,6 +209,9 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
                 char* username = find_username(cookie_set, curr_cookie);
                 int username_length = strlen(username);
                 int len_of_thing_to_add = username_length + 4;
+
+
+
                 send_page_to_user_no_cookie(page_to_sent, buff, n, sockfd,
                  len_of_thing_to_add);
                  // Add username into the main page
@@ -273,9 +285,11 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
             }
 
         }
-        else
+        else{
             // never used, just for completeness
             fprintf(stderr, "no other methods supported");
+            return false;
+        }
     }
     // send 404
     else if (write(sockfd, HTTP_404, HTTP_404_LENGTH) < 0)
@@ -285,6 +299,6 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
     }
 
     printf("Current max size is %d\n", cookie_set->max_size);
-    print_all_cookies(cookie_set);
+    // print_all_cookies(cookie_set);
     return true;
 }
