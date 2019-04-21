@@ -2,16 +2,19 @@ CC = gcc
 CFLAGS = -Wall
 
 EXE = image_tagger
-OBJ = main.o handle_http_request.o http_server.o cookie.o
+OBJ = main.o handle_http_request.o http_server.o cookie.o response.o
 
 
 $(EXE): $(OBJ)
 	$(CC) $(CFLAGS) -o $(EXE) $(OBJ)
 
-cookie.o: cookie.c cookie.h
-	$(CC) $(CFLAGS) -c cookie.c
+response.o: response.c response.h
+	$(CC) $(CFLAGS) -c response.c
 
-handle_http_request.o: handle_http_request.c handle_http_request.h html_pages.h cookie.o
+cookie.o: cookie.c cookie.h
+	$(CC) $(CFLAGS) -c cookie.chtml_pages.h
+
+handle_http_request.o: handle_http_request.c handle_http_request.h html_pages.h cookie.o response.o
 	$(CC) $(CFLAGS) -c handle_http_request.c
 
 main.o: main.c handle_http_request.o html_pages.h
