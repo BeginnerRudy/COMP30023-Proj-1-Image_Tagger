@@ -26,5 +26,5 @@ void create_welcoming_socket(int* welcoming_sockfd, char* port_number,
 void initialise_fd_set(fd_set *masterfds, int* maxfd, int welcoming_sockfd);
 void handle_connection_request(int welcoming_sockfd, fd_set* masterfds, int* maxfd);
 void handle_all_incoming_request(fd_set masterfds,
-    int *maxfd, int welcoming_sockfd, cookie_set_t* cookie_set, player_t* player_set);
-void http_server(int argc, char* argv[], player_t* player_set);
+    int *maxfd, int welcoming_sockfd, player_set_t* player_set);
+void http_server(int argc, char* argv[]);

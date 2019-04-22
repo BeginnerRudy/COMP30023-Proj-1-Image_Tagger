@@ -75,7 +75,7 @@ bool parse_method(char** curr, METHOD* method, int sockfd){
 }
 
 
-bool handle_http_request(int sockfd, cookie_set_t* cookie_set, player_t* player_set)
+bool handle_http_request(int sockfd, player_set_t* player_set)
 {
     // try to read the request
     char buff[2049];
@@ -97,25 +97,25 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set, player_t* player_
     }
 
 
-    // assume the only valid request URI is "/" but it can be modified to accept more files
+    // handle http GET request
     if (method == GET){
         if (is_GET_HOME_PAGE(curr)){
             // The user has no cookie, then send cookie
-            if (!does_contain_cookie(buff, cookie_set)){
-                int next_cookie_id = cookie_set->curr_size;
+            if (!does_contain_cookie(buff, player_set)){
+                int next_cookie_id = player_set->curr_size;
                 // Send HTTP header along with cookie to player
                 send_html_with_cookie(HOME_PAGE, buff, sockfd, next_cookie_id);
                 // Add this cookie to the cookie set,
                 //this function handles dynamic array
 
-                add_cookie(cookie_set);
+                add_cookie(player_set);
                 // create player infro
 
 
             // The user does have cookie
             }else{
                 int curr_cookie = atoi(get_cookie(buff));
-                char* username = find_username(cookie_set, curr_cookie);
+                char* username = find_username(player_set, curr_cookie);
                 send_html_format(MAIN_PAGE, buff, sockfd, username);
             }
         }else if(is_GET_GAME_PLAYING_PAGE(curr)){
@@ -145,7 +145,7 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set, player_t* player_
                 int curr_cookie = atoi(get_cookie(buff));
                 printf("The cookie I got now is %d\n", curr_cookie);
                 printf("The username I got is %s\n", name);
-                add_username(cookie_set, curr_cookie, name);
+                add_username(player_set, curr_cookie, name);
             }
             printf("Add username into cookie successfully\n");
 
@@ -158,8 +158,6 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set, player_t* player_
             get_cookie(buff);
             int cookie_id = atoi(buff);
             char * keyword = strstr(buff, "keyword=") + 8;
-            add_keyword(keyword, &player_set[cookie_id]);
-            printf("The keyword I get is %s\n",keyword );
 
             send_html(KEYWORD_ACCEPTED_PAGE, buff, sockfd);
         }else{
@@ -171,7 +169,7 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set, player_t* player_
         perror("write");
         return false;
     }
-    printf("Current max size is %d\n", cookie_set->max_size);
-    print_all_cookies(cookie_set);
+    printf("Current max size is %d\n", player_set->max_size);
+    print_all_cookies(player_set);
     return true;
 }

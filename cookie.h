@@ -8,22 +8,27 @@
 typedef struct{
     int cookie; // The cookie identifier
     char* username;// The username for the player has this cookie
-}cookie_t;
+    char** keywords; // the keyword for one player
+    int is_start;
+    int is_paired;
+    int is_game_end;
+    int is_game_over;
+}player_t;
 
 typedef struct{
-    cookie_t* cookies;
+    player_t* cookies;
     int curr_size;
     int max_size;
-}cookie_set_t;
+}player_set_t;
 
-cookie_set_t* create_cookie_set();
-char* find_username(cookie_set_t* cookie_set, int cookie_id);
-void add_username(cookie_set_t* cookie_set,
+player_set_t* create_player_set();
+char* find_username(player_set_t* player_set, int cookie_id);
+void add_username(player_set_t* player_set,
     int cookie_id, char* username);
-void update_memory_of_cookie_set(cookie_set_t* cookie_set,
+void update_memory_of_player_set(player_set_t* player_set,
     int next_cookie_id);
-void add_cookie(cookie_set_t* cookie_set);
-int is_valid_cookie(cookie_set_t* cookie_set, int cookie);
-void print_all_cookies(cookie_set_t* cookie_set);
-int does_contain_cookie(char* buff, cookie_set_t* cookie_set);
+void add_cookie(player_set_t* player_set);
+int is_valid_cookie(player_set_t* player_set, int cookie);
+void print_all_cookies(player_set_t* player_set);
+int does_contain_cookie(char* buff, player_set_t* player_set);
 char* get_cookie(char* buff);

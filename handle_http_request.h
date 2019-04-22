@@ -18,9 +18,8 @@
 
 #include "cookie.h"
 #include "response.h"
-#include "player.h"
 
-bool handle_http_request(int sockfd, cookie_set_t* cookie_set, player_t* player_set);
+bool handle_http_request(int sockfd, player_set_t* player_set);
 int is_GET_HOME_PAGE(char* curr);
 int is_GET_GAME_PLAYING_PAGE(char* curr);
 int is_GET_FAV_ICON(char* curr);

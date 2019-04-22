@@ -1,11 +1,11 @@
 #include "http_server.h"
 
-void http_server(int argc, char* argv[], player_t* player_set){
+void http_server(int argc, char* argv[]){
 
 
     //Cookie, username initilization
-    cookie_set_t *cookie_set;
-    cookie_set = create_cookie_set();
+    player_set_t *player_set;
+    player_set = create_player_set();
 
     int welcoming_sockfd,   // The fd for welcoming socket
       port_no;// The port number for this server would running on
@@ -38,11 +38,10 @@ void http_server(int argc, char* argv[], player_t* player_set){
     initialise_fd_set(&masterfds, &maxfd, welcoming_sockfd);
 
     // running the http Server
-    handle_all_incoming_request(masterfds, &maxfd, welcoming_sockfd, cookie_set,
-        player_set);
+    handle_all_incoming_request(masterfds, &maxfd, welcoming_sockfd, player_set);
 
-    free(cookie_set->cookies);
-    free(cookie_set);
+    free(player_set->cookies);
+    free(player_set);
 }
 
 void my_select(fd_set* readfds){
@@ -119,7 +118,7 @@ void handle_connection_request(int welcoming_sockfd, fd_set* masterfds, int* max
       }
 }
 void handle_all_incoming_request(fd_set masterfds, int *maxfd,
-    int welcoming_sockfd, cookie_set_t* cookie_set, player_t* player_set){
+    int welcoming_sockfd, player_set_t* player_set){
       int count = 1;
       while (1)
       {
@@ -142,7 +141,7 @@ void handle_all_incoming_request(fd_set masterfds, int *maxfd,
                     handle_connection_request(welcoming_sockfd, &masterfds, maxfd);
                   }
                   // a request is sent from the client
-                  else if (!handle_http_request(i, cookie_set, player_set))
+                  else if (!handle_http_request(i, player_set))
                   {
                       close(i);
                       FD_CLR(i, &masterfds);
