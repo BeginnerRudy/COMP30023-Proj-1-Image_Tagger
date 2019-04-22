@@ -75,14 +75,14 @@ bool parse_method(char** curr, METHOD* method, int sockfd){
 }
 
 
-bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
+bool handle_http_request(int sockfd, cookie_set_t* cookie_set, player_t* player_set)
 {
     // try to read the request
     char buff[2049];
     int n = read(sockfd, buff, 2049);
     // terminate the string
     buff[n] = 0;
-
+    printf("%s\n", buff);
     if (is_socket_closed(n, sockfd)){
         return false;
     }
@@ -109,6 +109,9 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
                 //this function handles dynamic array
 
                 add_cookie(cookie_set);
+                // create player infro
+
+
             // The user does have cookie
             }else{
                 int curr_cookie = atoi(get_cookie(buff));
@@ -152,6 +155,11 @@ bool handle_http_request(int sockfd, cookie_set_t* cookie_set)
             // keyword accepted
             // keyword discard
             // game completed
+            get_cookie(buff);
+            int cookie_id = atoi(buff);
+            char * keyword = strstr(buff, "keyword=") + 8;
+            add_keyword(keyword, &player_set[cookie_id]);
+            printf("The keyword I get is %s\n",keyword );
 
             send_html(KEYWORD_ACCEPTED_PAGE, buff, sockfd);
         }else{
