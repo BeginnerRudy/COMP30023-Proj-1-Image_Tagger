@@ -18,7 +18,7 @@
 
 #include "cookie.h"
 #include "response.h"
-
+#include "player.h"
 
 bool handle_http_request(int sockfd, cookie_set_t* cookie_set);
 int is_GET_HOME_PAGE(char* curr);
