@@ -1,4 +1,4 @@
-#include "cookie.h"
+#include "player.h"
 player_set_t* create_player_set(){
     //Cookie, username initilization
     player_set_t* player_set = (player_set_t*)malloc(sizeof(player_set_t));

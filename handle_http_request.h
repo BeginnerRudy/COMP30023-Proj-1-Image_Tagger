@@ -16,7 +16,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "cookie.h"
+#include "player.h"
 #include "response.h"
 
 bool handle_http_request(int sockfd, player_set_t* player_set);
