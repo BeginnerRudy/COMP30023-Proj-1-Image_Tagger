@@ -158,7 +158,8 @@ bool handle_http_request(int sockfd, player_set_t* player_set)
             get_cookie(buff);
             int cookie_id = atoi(buff);
             char * keyword = strstr(buff, "keyword=") + 8;
-
+            add_keyword(player_set, cookie_id, keyword);
+            printf("The keyword I got is %s\n", player_set->players->keywords[cookie_id]);
             send_html(KEYWORD_ACCEPTED_PAGE, buff, sockfd);
         }else{
             send_404(sockfd);

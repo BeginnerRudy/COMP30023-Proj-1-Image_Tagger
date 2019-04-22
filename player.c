@@ -3,15 +3,32 @@ player_set_t* create_player_set(){
     //Cookie, username initilization
     player_set_t* player_set = (player_set_t*)malloc(sizeof(player_set_t));
     player_set->curr_size = 0;
-    player_set->max_size = INITIAL_MAX_COOKIE_NUM;
-    player_set->cookies =
-    (player_t*)malloc(INITIAL_MAX_COOKIE_NUM*sizeof(player_t));
+    player_set->max_size = INITIAL_MAX_PLAYER_NUM;
+    player_set->players = (player_t*)malloc(INITIAL_MAX_PLAYER_NUM*sizeof(player_t));
+    initialise_players(player_set->players, 0, INITIAL_MAX_PLAYER_NUM);
     return player_set;
+}
+
+void initialise_players(player_t* players, int player_start_index, int player_end_index){
+    // player_start_index is inclusive and player_end_index us exclusive
+    for (int i = player_start_index; i < player_end_index; i++){
+        players[i].username = NULL;
+        players[i].is_start =
+        players[i].is_paired =
+        players[i].is_game_end =
+        players[i].is_game_over =
+        players[i].curr_keyword_count = 0;
+        players[i].keywords = (char**)malloc(MAX_NUM_OF_KEYWORD*sizeof(char*));
+        for (int j = 0; j < MAX_NUM_OF_KEYWORD; j++){
+            players[i].keywords[j] = (char*)malloc(MAX_KEYWORD_LENGTH*sizeof(char));
+        }
+    }
+    return;
 }
 
 char* find_username(player_set_t* player_set, int cookie_id){
     if (cookie_id <= player_set->max_size){
-        return player_set->cookies[cookie_id].username;
+        return player_set->players[cookie_id].username;
     }else{
         printf("Invalid Cookie ID, Out of range\n");
     }
@@ -20,30 +37,36 @@ char* find_username(player_set_t* player_set, int cookie_id){
 
 void add_username(player_set_t* player_set, int cookie_id, char* username){
     int len =strlen(username);
-    player_set->cookies[cookie_id].username = (char*)malloc(len*sizeof(char));
-    strncpy(player_set->cookies[cookie_id].username,
+    player_set->players[cookie_id].username = (char*)malloc(len*sizeof(char));
+    strncpy(player_set->players[cookie_id].username,
             username,
             strlen(username));
-    char* the_username = player_set->cookies[cookie_id].username;
+    char* the_username = player_set->players[cookie_id].username;
     the_username[len] = '\0';
+}
+
+void add_keyword(player_set_t* player_set, int cookie_id, char* keyword){
+    int len =strlen(keyword);
+    int index = player_set->players[cookie_id].curr_keyword_count++;
+    strncpy(player_set->players[cookie_id].keywords[index], keyword, len);
+    char* the_keyword = player_set->players[cookie_id].keywords[index];
+    the_keyword[len] = '\0';
 }
 
 void add_cookie(player_set_t* player_set){
     int next_cookie_id = player_set->curr_size;
 
     update_memory_of_player_set(player_set, next_cookie_id);
-    player_set->cookies[next_cookie_id].cookie = next_cookie_id;
+    player_set->players[next_cookie_id].cookie = next_cookie_id;
     player_set->curr_size += 1;
 }
 
 void update_memory_of_player_set(player_set_t* player_set, int next_cookie_id){
     if (next_cookie_id >= player_set->max_size){
         player_set->max_size *= 2;
-        player_set->cookies
-        = realloc(player_set->cookies, player_set->max_size * sizeof(player_t));
-        for (int i = player_set->max_size/2; i < player_set->max_size; i++){
-            player_set->cookies[i].username = NULL;
-        }
+        player_set->players
+        = realloc(player_set->players, player_set->max_size * sizeof(player_t));
+        initialise_players(player_set->players, player_set->max_size/2, player_set->max_size);
     }
 }
 
@@ -57,12 +80,12 @@ int is_valid_cookie(player_set_t* player_set, int cookie){
 void print_all_cookies(player_set_t* player_set){
     printf("Summary of cookie and username pairs\n");
     for (int i=0; i < player_set->curr_size; i++){
-        printf("Cookie :%d ", player_set->cookies[i].cookie);
-        // printf("%s\n", player_set->cookies[i].username);
+        printf("Cookie :%d ", player_set->players[i].cookie);
+        // printf("%s\n", player_set->player[i].username);
         char* username;
-        if (player_set->cookies[i].username != NULL){
+        if (player_set->players[i].username != NULL){
             printf("The username for cookie %d is not null.\n", i);
-            username = player_set->cookies[i].username;
+            username = player_set->players[i].username;
             printf("get username successfully %s\n", username);
         }else{
             printf("The cookie %d has no username\n",i );
@@ -70,7 +93,7 @@ void print_all_cookies(player_set_t* player_set){
         }
         printf("Username:%s\n", username);
     }
-    printf("Print all cookies successfully\n");
+    printf("Print all player successfully\n");
 }
 int does_contain_cookie(char* buff, player_set_t* player_set){
     if (strstr(buff, "Cookie: ") != NULL &&
