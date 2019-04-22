@@ -125,3 +125,17 @@ char* get_cookie(char* buff){
     }
     return NULL;
 }
+
+
+char* parse_and_format_keyword(char* buff){
+    char* curr = strstr(buff, "keyword=") + 8;
+    char* keyword = (char*)malloc(MAX_KEYWORD_LENGTH*sizeof(char));
+    int count = 0;
+    while(*curr != KEYWORD_STOP_CHAR){
+        keyword[count++] = *curr;
+        curr++;
+    }
+    keyword[count++] = '\n';
+    keyword[count++] = '\0';
+    return keyword;
+}
