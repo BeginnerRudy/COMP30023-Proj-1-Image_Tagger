@@ -39,3 +39,4 @@ int is_valid_cookie(player_set_t* player_set, int cookie);
 void print_all_cookies(player_set_t* player_set);
 int does_contain_cookie(char* buff, player_set_t* player_set);
 char* get_cookie(char* buff);char* parse_and_format_keyword(char* buff);
+char* get_all_key_words_in_one_string(player_t *player);

@@ -135,7 +135,19 @@ char* parse_and_format_keyword(char* buff){
         keyword[count++] = *curr;
         curr++;
     }
-    keyword[count++] = '\n';
-    keyword[count++] = '\0';
+    strncpy(keyword+count, "<br>", 5);
     return keyword;
+}
+
+char* get_all_key_words_in_one_string(player_t *player){
+    int max_length_of_all_keywords = MAX_KEYWORD_LENGTH*MAX_NUM_OF_KEYWORD;
+    int curr_pt = 0;
+    char* all_keywords = (char*)malloc(max_length_of_all_keywords*sizeof(char));
+    for (int i = 0; i < player->curr_keyword_count; i++){
+        int len = strlen(player->keywords[i]);
+        strncpy(all_keywords+curr_pt, player->keywords[i], len);
+        curr_pt += len;
+    }
+    all_keywords[curr_pt] = '\0';
+    return all_keywords;
 }
