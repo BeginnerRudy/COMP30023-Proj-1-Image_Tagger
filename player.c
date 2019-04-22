@@ -110,7 +110,7 @@ char* get_cookie(char* buff){
         int curr_size = 0;
         int max_size = 1;
 
-        while (!isdigit(*cookie_curr_pt)){
+        while (isdigit(*cookie_curr_pt)){
             // check whether to expand memory
             if (curr_size == max_size){
                 max_size *= 2;

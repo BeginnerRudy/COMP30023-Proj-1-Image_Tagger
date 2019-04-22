@@ -157,6 +157,7 @@ bool handle_http_request(int sockfd, player_set_t* player_set)
             // game completed
             int cookie_id = atoi(get_cookie(buff));
             char * keyword = parse_and_format_keyword(buff);
+            printf("The cookie I got is %d\n", cookie_id);
             add_keyword(player_set, cookie_id, keyword);
             printf("The keyword I got is %s\n",
                 get_all_key_words_in_one_string(&player_set->players[cookie_id]));
