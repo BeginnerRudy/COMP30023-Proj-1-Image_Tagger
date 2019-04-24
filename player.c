@@ -151,3 +151,7 @@ char* get_all_key_words_in_one_string(player_t *player){
     all_keywords[curr_pt] = '\0';
     return all_keywords;
 }
+
+int does_keyword_match(char* keyword, player_t* player){
+
+}
