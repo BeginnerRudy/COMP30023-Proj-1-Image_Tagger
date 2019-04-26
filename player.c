@@ -185,3 +185,18 @@ void free_player_set(player_set_t* player_set){
     free(player_set->players);
     free(player_set);
 }
+
+void clear_player_keywords(player_t* player){
+    // Free previous keywords
+    for (int i = 0; i < player->curr_keyword_count; i++){
+        free(player->keywords[i]);
+    }
+    free(player->keywords);
+    player->curr_keyword_count = 0;
+
+    // Allocate new keywords
+    player->keywords = (char**)malloc(MAX_NUM_OF_KEYWORD*sizeof(char*));
+    for (int j = 0; j < MAX_NUM_OF_KEYWORD; j++){
+        player->keywords[j] = (char*)malloc(MAX_KEYWORD_LENGTH*sizeof(char));
+    }
+}

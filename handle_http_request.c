@@ -139,47 +139,93 @@ bool handle_GET_request(char* curr, player_set_t* player_set, int sockfd,
 
 bool handle_POST_request(char* curr, player_set_t* player_set, int sockfd,
     game_info_t* game_info){
-    if(is_QUIT(curr)){
-        send_html(GAME_OVER_PAGE, sockfd);
-        return false;
-    }
-    //TODO if there is only one player playing
-    //TODO else if there are two players playing
-    else if(is_SUBMIT_Username(curr)){
-        // locate the username, it is safe to do so in this sample code, but usually the result is expected to be
-        // copied to another buffer using strcpy or strncpy to ensure that it will not be overwritten.
+    if(is_SUBMIT_Username(curr)){
         char * name = strstr(curr, "user=") + 5;
-
         get_cookie(curr);
-        printf("get_cookie() successfully\n");
 
         // store the username along with cookie ID
         if (get_cookie(curr) == NULL){
             printf("No cookie provided\n");
+            return false;
         }else{
-            printf("Cookie provided.\n");
             int curr_cookie = atoi(get_cookie(curr));
-            printf("The cookie I got now is %d\n", curr_cookie);
-            printf("The username I got is %s\n", name);
             add_username(player_set, curr_cookie, name);
         }
-        printf("Add username into cookie successfully\n");
 
         // send the modified Main Page
         return send_html_format(MAIN_PAGE, sockfd, name);
+    }else if (is_QUIT(curr)){
+        // If the game is over, send back game over page
+        if (game_info->is_game_over == 1){
+            game_info->is_game_over = 0;
+            game_info->num_active_player = 0;
+            clear_player_game_info(game_info, atoi(get_cookie(curr)));
+            print_game_info(game_info);
+            return send_html(GAME_OVER_PAGE, sockfd);
+        // If the game is end, send back game completed game
+        }else if(game_info->is_game_end == 1){
+            game_info->is_game_end = 0;
+            game_info->is_game_over = 1;
+            game_info->num_active_player = 0;
+            clear_player_game_info(game_info, atoi(get_cookie(curr)));
+            print_game_info(game_info);
+            return send_html(GAME_OVER_PAGE, sockfd);
+        }else if(game_info->num_active_player == 1){
+            clear_player_game_info(game_info, atoi(get_cookie(curr)));
+            game_info->num_active_player = 0;
+            print_game_info(game_info);
+            return send_html(GAME_OVER_PAGE, sockfd);
+        }else if(game_info->num_active_player == 2){
+            game_info->is_game_over = 1;
+            clear_player_game_info(game_info, atoi(get_cookie(curr)));
+            game_info->num_active_player = 1;
+            print_game_info(game_info);
+            return send_html(GAME_OVER_PAGE, sockfd);
+        }else{
+            return send_html(GAME_OVER_PAGE, sockfd);
+        }
     }else if(is_GUESS_Keyword(curr)){
-        // keyword accepted
-        // keyword discard
-        // game completed
-        int cookie_id = atoi(get_cookie(curr));
-        char * keyword = parse_and_format_keyword(curr);
-        printf("The cookie I got is %d\n", cookie_id);
-        add_keyword(player_set, cookie_id, keyword);
-        printf("The keyword I got is %s\n",
-            get_all_key_words_in_one_string(&player_set->players[cookie_id]));
-        return send_html_format(KEYWORD_ACCEPTED_PAGE, sockfd,
-            get_all_key_words_in_one_string(&player_set->players[cookie_id]));
+        printf("Strating to guessing \n");
+        print_game_info(game_info);
+        // If the game is over, send back game over page
+        if (game_info->is_game_over == 1){
+            game_info->is_game_over = 0;
+            game_info->num_active_player = 0;
+            clear_player_game_info(game_info, atoi(get_cookie(curr)));
+            print_game_info(game_info);
+            return send_html(GAME_OVER_PAGE, sockfd);
+        // If the game is end, send back game completed game
+        }else if(game_info->is_game_end == 1){
+            game_info->is_game_end = 0;
+            game_info->num_active_player = 0;
+            clear_player_game_info(game_info, atoi(get_cookie(curr)));
+            print_game_info(game_info);
+            return send_html(GAME_COMPLETED_PAGE, sockfd);
+        }else if(game_info->num_active_player == 1){
+            print_game_info(game_info);
+            return send_html(KEYWORD_DISCARDED_PAGE, sockfd);
+        }else if(game_info->num_active_player == 2){
+            int cookie_id = atoi(get_cookie(curr));
+            char * keyword = parse_and_format_keyword(curr);
+            add_keyword(player_set, cookie_id, keyword);
+            player_t* another_player = get_another_player(game_info, cookie_id);
+            if (does_keyword_match(keyword, another_player)){
+                game_info->is_game_end = 1;
+                clear_player_game_info(game_info, atoi(get_cookie(curr)));
+                game_info->num_active_player = 1;
+                print_game_info(game_info);
+                return send_html(GAME_COMPLETED_PAGE, sockfd);
+            }else{
+                print_game_info(game_info);
+                return send_html_format(KEYWORD_ACCEPTED_PAGE, sockfd,
+                    get_all_key_words_in_one_string(&player_set->players[cookie_id]));
+            }
+        }else{
+            return send_404(sockfd);
+        }
     }else{
         return send_404(sockfd);
     }
+
+    return false;
 }

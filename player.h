@@ -42,3 +42,4 @@ player_t* get_player_by_cookie(player_set_t* player_set, int cookie_id);
 int does_keyword_match(char* keyword, player_t* other_player);
 void free_player_set(player_set_t* player_set);
 void print_player(player_t* player);
+void clear_player_keywords(player_t* player);
