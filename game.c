@@ -8,6 +8,7 @@ game_info_t* create_game_info(){
     game_info->is_game_end =
     game_info->is_game_over =
     game_info->num_active_player = 0;
+    game_info->round = 1;
     return game_info;
 }
 

@@ -6,6 +6,7 @@ typedef struct{
     int is_game_end;// 0 for not fame end, otherwise game end
     int is_game_over;// 0 for not game over, otherwise game end
     int num_active_player;// Number of player playing game now.
+    int round; // different round has different image
 }game_info_t;
 
 game_info_t* create_game_info();

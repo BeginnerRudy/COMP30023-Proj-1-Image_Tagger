@@ -129,9 +129,8 @@ bool handle_GET_request(char* curr, player_set_t* player_set, int sockfd,
         int cookie_id = atoi(get_cookie(curr));
         player_t* curr_player = get_player_by_cookie(player_set, cookie_id);
         register_into_game(game_info, curr_player);
-        curr_player->round++;
         print_game_info(game_info);
-        char* image_src = get_img_src(curr_player->round);
+        char* image_src = get_img_src(game_info->round);
         return send_html_format(GAME_PLAYING_PAGE, sockfd, ONE_FORMAT_STRING, image_src);
     }else if(is_GET_FAV_ICON(curr)){
         return send_fav_icon(FAV_ICON, sockfd);
@@ -206,9 +205,7 @@ bool handle_POST_request(char* curr, player_set_t* player_set, int sockfd,
             return send_html(GAME_COMPLETED_PAGE, sockfd);
         }else if(game_info->num_active_player == 1){
             print_game_info(game_info);
-            int cookie_id = atoi(get_cookie(curr));
-            player_t* curr_player = get_player_by_cookie(player_set, cookie_id);
-            char* image_src = get_img_src(curr_player->round);
+            char* image_src = get_img_src(game_info->round);
             return send_html_format(KEYWORD_DISCARDED_PAGE, sockfd, ONE_FORMAT_STRING, image_src);
         }else if(game_info->num_active_player == 2){
             int cookie_id = atoi(get_cookie(curr));
@@ -220,12 +217,11 @@ bool handle_POST_request(char* curr, player_set_t* player_set, int sockfd,
                 clear_player_game_info(game_info, atoi(get_cookie(curr)));
                 game_info->num_active_player = 1;
                 print_game_info(game_info);
+                game_info->round++;
                 return send_html(GAME_COMPLETED_PAGE, sockfd);
             }else{
                 print_game_info(game_info);
-                int cookie_id = atoi(get_cookie(curr));
-                player_t* curr_player = get_player_by_cookie(player_set, cookie_id);
-                char* image_src = get_img_src(curr_player->round);
+                char* image_src = get_img_src(game_info->round);
                 return send_html_format(KEYWORD_ACCEPTED_PAGE, sockfd, TWO_FORMAT_STRING,
                     image_src, get_all_key_words_in_one_string(&player_set->players[cookie_id]));
             }
