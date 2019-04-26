@@ -2,7 +2,6 @@
 
 void http_server(int argc, char* argv[]){
 
-
     //Cookie, username initilization
     player_set_t *player_set;
     player_set = create_player_set();
