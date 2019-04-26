@@ -156,3 +156,13 @@ bool send_body(int sockfd, char* buff, int n, char* page_to_send){
     close(filefd);
     return true;
 }
+
+char* get_img_src(int round){
+    char* image_src = (char*)malloc(MAX_PATH_LENGTH*sizeof(char));
+    if (round == 1){
+        strcpy(image_src, TURN_1_IMAGE_PATH);
+    }else{
+        strcpy(image_src, TURN_2_IMAGE_PATH);
+    }
+    return image_src;
+}

@@ -11,7 +11,7 @@ typedef struct{
     int cookie; // The cookie identifier
     char* username;// The username for the player has this cookie
     char** keywords; // the keyword for one player
-    int round_player; // different round has different image
+    int round; // different round has different image
     int curr_keyword_count;
 }player_t;
 

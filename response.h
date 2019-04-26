@@ -40,6 +40,9 @@ typedef enum
 } METHOD;
 
 #define KEYWORD_STOP_CHAR '&'
+#define TURN_1_IMAGE_PATH "https://swift.rc.nectar.org.au/v1/AUTH_eab314456b624071ac5aecd721b977f0/comp30023-project/image-2.jpg"
+#define TURN_2_IMAGE_PATH "https://cpb-ap-se2.wpmucdn.com/blogs.unimelb.edu.au/dist/7/166/files/2018/06/MUM-15a_CMYK-s2bzzv.jpg"
+#define MAX_PATH_LENGTH 512
 
 char* my_readfile(char* page_to_send);
 char* prepare_html_format(int* n, char* page_to_send, const char* string,...);
@@ -50,3 +53,4 @@ bool send_html(char* page_to_send, int sockfd);
 bool send_html_with_cookie(char* page_to_send, int sockfd, int cookie_id);
 bool send_fav_icon(char* page_to_send, int sockfd);
 bool send_404(int sockfd);
+char* get_img_src(int round);

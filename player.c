@@ -13,7 +13,8 @@ void initialise_players(player_t* players, int player_start_index, int player_en
     // player_start_index is inclusive and player_end_index us exclusive
     for (int i = player_start_index; i < player_end_index; i++){
         players[i].username = NULL;
-        players[i].curr_keyword_count = 0;
+        players[i].curr_keyword_count = 
+        players[i].round = 0;
         players[i].keywords = (char**)malloc(MAX_NUM_OF_KEYWORD*sizeof(char*));
         for (int j = 0; j < MAX_NUM_OF_KEYWORD; j++){
             players[i].keywords[j] = (char*)malloc(MAX_KEYWORD_LENGTH*sizeof(char));
