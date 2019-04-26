@@ -122,7 +122,7 @@ bool handle_GET_request(char* curr, player_set_t* player_set, int sockfd,
         }else{
             int curr_cookie = atoi(get_cookie(curr));
             char* username = find_username(player_set, curr_cookie);
-            return send_html_format(MAIN_PAGE, sockfd, username);
+            return send_html_format(MAIN_PAGE, sockfd, ONE_FORMAT_STRING, username);
         }
     }else if(is_GET_GAME_PLAYING_PAGE(curr)){
         // register this player into game
@@ -132,7 +132,7 @@ bool handle_GET_request(char* curr, player_set_t* player_set, int sockfd,
         curr_player->round++;
         print_game_info(game_info);
         char* image_src = get_img_src(curr_player->round);
-        return send_html_format(GAME_PLAYING_PAGE, sockfd, image_src);
+        return send_html_format(GAME_PLAYING_PAGE, sockfd, ONE_FORMAT_STRING, image_src);
     }else if(is_GET_FAV_ICON(curr)){
         return send_fav_icon(FAV_ICON, sockfd);
     }else{
@@ -156,7 +156,7 @@ bool handle_POST_request(char* curr, player_set_t* player_set, int sockfd,
         }
 
         // send the modified Main Page
-        return send_html_format(MAIN_PAGE, sockfd, name);
+        return send_html_format(MAIN_PAGE, sockfd, ONE_FORMAT_STRING, name);
     }else if (is_QUIT(curr)){
         // If the game is over, send back game over page
         if (game_info->is_game_over == 1){
@@ -209,7 +209,7 @@ bool handle_POST_request(char* curr, player_set_t* player_set, int sockfd,
             int cookie_id = atoi(get_cookie(curr));
             player_t* curr_player = get_player_by_cookie(player_set, cookie_id);
             char* image_src = get_img_src(curr_player->round);
-            return send_html_format(KEYWORD_DISCARDED_PAGE, sockfd, image_src);
+            return send_html_format(KEYWORD_DISCARDED_PAGE, sockfd, ONE_FORMAT_STRING, image_src);
         }else if(game_info->num_active_player == 2){
             int cookie_id = atoi(get_cookie(curr));
             char * keyword = parse_and_format_keyword(curr);
@@ -226,8 +226,8 @@ bool handle_POST_request(char* curr, player_set_t* player_set, int sockfd,
                 int cookie_id = atoi(get_cookie(curr));
                 player_t* curr_player = get_player_by_cookie(player_set, cookie_id);
                 char* image_src = get_img_src(curr_player->round);
-                return send_html_format(KEYWORD_ACCEPTED_PAGE, sockfd, image_src,
-                    get_all_key_words_in_one_string(&player_set->players[cookie_id]));
+                return send_html_format(KEYWORD_ACCEPTED_PAGE, sockfd, TWO_FORMAT_STRING,
+                    image_src, get_all_key_words_in_one_string(&player_set->players[cookie_id]));
             }
         }else{
             return send_404(sockfd);

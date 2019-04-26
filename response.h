@@ -15,6 +15,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <stdarg.h>
 
 #include "html_pages.h"
 
@@ -43,10 +44,12 @@ typedef enum
 #define TURN_1_IMAGE_PATH "https://swift.rc.nectar.org.au/v1/AUTH_eab314456b624071ac5aecd721b977f0/comp30023-project/image-2.jpg"
 #define TURN_2_IMAGE_PATH "https://cpb-ap-se2.wpmucdn.com/blogs.unimelb.edu.au/dist/7/166/files/2018/06/MUM-15a_CMYK-s2bzzv.jpg"
 #define MAX_PATH_LENGTH 512
+#define ONE_FORMAT_STRING 1
+#define TWO_FORMAT_STRING 2
 
 char* my_readfile(char* page_to_send);
-char* prepare_html_format(int* n, char* page_to_send, const char* string,...);
-bool send_html_format(char* page_to_send, int sockfd, const char* string,...);
+char* prepare_html_format(int* n, char* page_to_send, int num_format, const char* string,...);
+bool send_html_format(char* page_to_send, int sockfd, int num_format, const char* string,...);
 bool send_body(int sockfd, char* buff, int n, char* page_to_sent);
 bool mysendfile(int sockfd, char* buff, int n);
 bool send_html(char* page_to_send, int sockfd);

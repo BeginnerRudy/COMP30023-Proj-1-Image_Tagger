@@ -29,23 +29,33 @@ bool mysendfile(int sockfd, char* buff, int n){
     return true;
 }
 
-char* prepare_html_format(int* n, char* page_to_send, const char* string,...){
+char* prepare_html_format(int* n, char* page_to_send, int num_format, const char* string,...){
     char* html = (char*)malloc(2049*sizeof(char));
 
     char * buffer = my_readfile(page_to_send);
 
-    if (buffer)
-    {
-      // start to process your data / extract strings here...
-      *n = sprintf(html, buffer, string);
+    if (num_format == 1){
+        if (buffer)
+        {
+          // start to process your data / extract strings here...
+          *n = sprintf(html, buffer, string);
+        }
+    }else if(num_format == 2){
+        va_list format;
+        va_start(format, string);
+        if (buffer)
+        {
+            char* format2 = va_arg(format, char*);
+          *n = sprintf(html, buffer, string, format2);
+        }
     }
     return html;
 }
 
 bool send_html_format(char* page_to_send,
-    int sockfd, const char* string,...){
+    int sockfd, int num_format, const char* string,...){
     int len_html;
-    char* html = prepare_html_format(&len_html, page_to_send, string);
+    char* html = prepare_html_format(&len_html, page_to_send, num_format, string);
     char buff[2049];
     int n = sprintf(buff, HTTP_200_FORMAT, len_html);
     // send the header first
