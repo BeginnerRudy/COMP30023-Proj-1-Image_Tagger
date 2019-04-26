@@ -11,10 +11,7 @@ typedef struct{
     int cookie; // The cookie identifier
     char* username;// The username for the player has this cookie
     char** keywords; // the keyword for one player
-    int is_start;
-    int is_paired;
-    int is_game_end;
-    int is_game_over;
+    int round_player; // different round has different image
     int curr_keyword_count;
 }player_t;
 
@@ -41,3 +38,4 @@ int does_contain_cookie(char* buff, player_set_t* player_set);
 char* get_cookie(char* buff);char* parse_and_format_keyword(char* buff);
 char* get_all_key_words_in_one_string(player_t *player);
 int does_keyword_match(char* keyword, player_t* player);
+void free_player_set(player_set_t* player_set);

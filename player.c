@@ -13,10 +13,6 @@ void initialise_players(player_t* players, int player_start_index, int player_en
     // player_start_index is inclusive and player_end_index us exclusive
     for (int i = player_start_index; i < player_end_index; i++){
         players[i].username = NULL;
-        players[i].is_start =
-        players[i].is_paired =
-        players[i].is_game_end =
-        players[i].is_game_over =
         players[i].curr_keyword_count = 0;
         players[i].keywords = (char**)malloc(MAX_NUM_OF_KEYWORD*sizeof(char*));
         for (int j = 0; j < MAX_NUM_OF_KEYWORD; j++){
@@ -154,4 +150,16 @@ char* get_all_key_words_in_one_string(player_t *player){
 
 int does_keyword_match(char* keyword, player_t* player){
 
+}
+
+void free_player_set(player_set_t* player_set){
+    for (int i = 0; i < player_set->curr_size; i++){
+        free(player_set->players[i].username);
+        for (int j = 0; j < player_set->players[i].curr_keyword_count; j++){
+            free(player_set->players[i].keywords[j]);
+        }
+        free(player_set->players[i].keywords);
+    }
+    free(player_set->players);
+    free(player_set);
 }

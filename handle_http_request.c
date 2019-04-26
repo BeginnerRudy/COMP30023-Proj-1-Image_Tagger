@@ -120,16 +120,20 @@ bool handle_http_request(int sockfd, player_set_t* player_set)
             }
         }else if(is_GET_GAME_PLAYING_PAGE(curr)){
             send_html(GAME_PLAYING_PAGE, buff, sockfd);
+            // TODO make playring_player point to current player
         }else if(is_GET_FAV_ICON(curr)){
             send_fav_icon(FAV_ICON, sockfd);
         }else{
-            send_404(sockfd);
+            return send_404(sockfd);
         }
     }else if(method == POST){
         if(is_QUIT(buff)){
             send_html(GAME_OVER_PAGE, buff, sockfd);
             return false;
-        }else if(is_SUBMIT_Username(buff)){
+        }
+        //TODO if there is only one player playing
+        //TODO else if there are two players playing
+        else if(is_SUBMIT_Username(buff)){
             // locate the username, it is safe to do so in this sample code, but usually the result is expected to be
             // copied to another buffer using strcpy or strncpy to ensure that it will not be overwritten.
             char * name = strstr(buff, "user=") + 5;
@@ -164,13 +168,11 @@ bool handle_http_request(int sockfd, player_set_t* player_set)
             send_html_format(KEYWORD_ACCEPTED_PAGE, buff, sockfd,
                 get_all_key_words_in_one_string(&player_set->players[cookie_id]));
         }else{
-            send_404(sockfd);
+            return send_404(sockfd);
         }
     }
-    else if (write(sockfd, HTTP_404, HTTP_404_LENGTH) < 0)
-    {
-        perror("write");
-        return false;
+    else{
+        return send_404(sockfd);
     }
     printf("Current max size is %d\n", player_set->max_size);
     print_all_cookies(player_set);

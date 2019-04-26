@@ -40,8 +40,8 @@ void http_server(int argc, char* argv[]){
     // running the http Server
     handle_all_incoming_request(masterfds, &maxfd, welcoming_sockfd, player_set);
 
-    free(player_set->cookies);
-    free(player_set);
+    // free the player set
+    free_player_set(player_set);
 }
 
 void my_select(fd_set* readfds){
@@ -120,6 +120,8 @@ void handle_connection_request(int welcoming_sockfd, fd_set* masterfds, int* max
 void handle_all_incoming_request(fd_set masterfds, int *maxfd,
     int welcoming_sockfd, player_set_t* player_set){
       int count = 1;
+      //TODO player1 player2
+      //TODO is_game_end, is_game_over
       while (1)
       {
         printf("++++++++++++++++++++++++++++Loop %d+++++++++++++++++++++++++\n", count++);
