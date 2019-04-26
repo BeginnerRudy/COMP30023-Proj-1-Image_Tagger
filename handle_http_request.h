@@ -27,3 +27,5 @@ int is_QUIT(char* buff);
 int is_SUBMIT_Username(char* buff);
 int is_GUESS_Keyword(char* buff);
 bool is_socket_closed(int n, int sockfd);
+
+bool handle_GET_request(char* curr, player_set_t* player_set, int sockfd);

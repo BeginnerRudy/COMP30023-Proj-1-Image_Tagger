@@ -42,10 +42,11 @@ char* prepare_html_format(int* n, char* page_to_send, const char* string,...){
     return html;
 }
 
-bool send_html_format(char* page_to_send, char* buff,
+bool send_html_format(char* page_to_send,
     int sockfd, const char* string,...){
     int len_html;
     char* html = prepare_html_format(&len_html, page_to_send, string);
+    char buff[2049];
     int n = sprintf(buff, HTTP_200_FORMAT, len_html);
     // send the header first
     if(!mysendfile(sockfd, buff, n)){
@@ -58,8 +59,9 @@ bool send_html_format(char* page_to_send, char* buff,
     return true;
 }
 
-bool send_html(char* page_to_send, char* buff, int sockfd){
+bool send_html(char* page_to_send, int sockfd){
     char* html = my_readfile(page_to_send);
+    char buff[2049];
     int len_html = strlen(html);
     int n = sprintf(buff, HTTP_200_FORMAT, len_html);
     // send the header first
@@ -73,9 +75,10 @@ bool send_html(char* page_to_send, char* buff, int sockfd){
     return true;
 }
 
-bool send_html_with_cookie(char* page_to_send, char* buff, int sockfd,
+bool send_html_with_cookie(char* page_to_send, int sockfd,
     int cookie_id){
     char* html = my_readfile(page_to_send);
+    char buff[2049];
     int len_html = strlen(html);
     int n = sprintf(buff, HTTP_200_FORMAT_WITH_COOKIE, len_html, cookie_id);
     // send the header first
@@ -151,25 +154,5 @@ bool send_body(int sockfd, char* buff, int n, char* page_to_send){
         return false;
     }
     close(filefd);
-    return true;
-}
-
-bool send_page_to_user_with_cookie(char* page_to_send, char* buff,
-    int n, int sockfd, int num_bit_add, int cookie_id){
-    // get the size of the file
-    struct stat st;
-    stat(page_to_send, &st);
-    n = sprintf(buff, HTTP_200_FORMAT_WITH_COOKIE, st.st_size + num_bit_add, cookie_id);
-    send_body(sockfd, buff, n, page_to_send);
-    return true;
-}
-
-bool send_page_to_user_no_cookie(char* page_to_send, char* buff,
-    int n, int sockfd, int num_bit_add){
-    // get the size of the file
-    struct stat st;
-    stat(page_to_send, &st);
-    n = sprintf(buff, HTTP_200_FORMAT, st.st_size + num_bit_add);
-    send_body(sockfd, buff, n, page_to_send);
     return true;
 }

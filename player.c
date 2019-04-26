@@ -148,8 +148,15 @@ char* get_all_key_words_in_one_string(player_t *player){
     return all_keywords;
 }
 
-int does_keyword_match(char* keyword, player_t* player){
-
+int does_keyword_match(char* keyword, player_t* other_player){
+    char** other_player_keywords = other_player->keywords;
+    int num_keywords = other_player->curr_keyword_count;
+    for (int i = 0; i < num_keywords; i++){
+        if (strcmp(keyword, other_player_keywords[i]) == 0){
+            return 1;
+        }
+    }
+    return 0;
 }
 
 void free_player_set(player_set_t* player_set){

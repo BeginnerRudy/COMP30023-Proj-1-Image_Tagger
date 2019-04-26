@@ -102,33 +102,28 @@ bool handle_http_request(int sockfd, player_set_t* player_set)
         if (is_GET_HOME_PAGE(curr)){
             // The user has no cookie, then send cookie
             if (!does_contain_cookie(buff, player_set)){
-                int next_cookie_id = player_set->curr_size;
-                // Send HTTP header along with cookie to player
-                send_html_with_cookie(HOME_PAGE, buff, sockfd, next_cookie_id);
-                // Add this cookie to the cookie set,
-                //this function handles dynamic array
-
+                int new_cookie_id = player_set->curr_size;
                 add_cookie(player_set);
-                // create player infro
 
-
+                // Send HTTP header along with cookie to player
+                return send_html_with_cookie(HOME_PAGE, sockfd, new_cookie_id);
             // The user does have cookie
             }else{
                 int curr_cookie = atoi(get_cookie(buff));
                 char* username = find_username(player_set, curr_cookie);
-                send_html_format(MAIN_PAGE, buff, sockfd, username);
+                return send_html_format(MAIN_PAGE, sockfd, username);
             }
         }else if(is_GET_GAME_PLAYING_PAGE(curr)){
-            send_html(GAME_PLAYING_PAGE, buff, sockfd);
+            return send_html(GAME_PLAYING_PAGE, sockfd);
             // TODO make playring_player point to current player
         }else if(is_GET_FAV_ICON(curr)){
-            send_fav_icon(FAV_ICON, sockfd);
+            return send_fav_icon(FAV_ICON, sockfd);
         }else{
             return send_404(sockfd);
         }
     }else if(method == POST){
         if(is_QUIT(buff)){
-            send_html(GAME_OVER_PAGE, buff, sockfd);
+            send_html(GAME_OVER_PAGE, sockfd);
             return false;
         }
         //TODO if there is only one player playing
@@ -154,7 +149,7 @@ bool handle_http_request(int sockfd, player_set_t* player_set)
             printf("Add username into cookie successfully\n");
 
             // send the modified Main Page
-            send_html_format(MAIN_PAGE, buff, sockfd, name);
+            send_html_format(MAIN_PAGE, sockfd, name);
         }else if(is_GUESS_Keyword(buff)){
             // keyword accepted
             // keyword discard
@@ -165,7 +160,7 @@ bool handle_http_request(int sockfd, player_set_t* player_set)
             add_keyword(player_set, cookie_id, keyword);
             printf("The keyword I got is %s\n",
                 get_all_key_words_in_one_string(&player_set->players[cookie_id]));
-            send_html_format(KEYWORD_ACCEPTED_PAGE, buff, sockfd,
+            send_html_format(KEYWORD_ACCEPTED_PAGE, sockfd,
                 get_all_key_words_in_one_string(&player_set->players[cookie_id]));
         }else{
             return send_404(sockfd);
@@ -177,4 +172,28 @@ bool handle_http_request(int sockfd, player_set_t* player_set)
     printf("Current max size is %d\n", player_set->max_size);
     print_all_cookies(player_set);
     return true;
+}
+
+bool handle_GET_request(char* curr, player_set_t* player_set, int sockfd){
+    if (is_GET_HOME_PAGE(curr)){
+        // The user has no cookie
+        if (!does_contain_cookie(curr, player_set)){
+            int new_cookie_id = player_set->curr_size;
+            add_cookie(player_set);
+            // Send HTTP header along with cookie to player as well as the welcome page
+            return send_html_with_cookie(HOME_PAGE, sockfd, new_cookie_id);
+        // The user does have cookie
+        }else{
+            int curr_cookie = atoi(get_cookie(curr));
+            char* username = find_username(player_set, curr_cookie);
+            return send_html_format(MAIN_PAGE, sockfd, username);
+        }
+    }else if(is_GET_GAME_PLAYING_PAGE(curr)){
+        return send_html(GAME_PLAYING_PAGE, sockfd);
+        // TODO make playring_player point to current player
+    }else if(is_GET_FAV_ICON(curr)){
+        return send_fav_icon(FAV_ICON, sockfd);
+    }else{
+        return send_404(sockfd);
+    }
 }

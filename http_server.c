@@ -1,10 +1,10 @@
 #include "http_server.h"
 
 void http_server(int argc, char* argv[]){
-
     //Cookie, username initilization
     player_set_t *player_set;
     player_set = create_player_set();
+
 
     int welcoming_sockfd,   // The fd for welcoming socket
       port_no;// The port number for this server would running on

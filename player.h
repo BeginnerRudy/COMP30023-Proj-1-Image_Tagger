@@ -37,5 +37,5 @@ void print_all_cookies(player_set_t* player_set);
 int does_contain_cookie(char* buff, player_set_t* player_set);
 char* get_cookie(char* buff);char* parse_and_format_keyword(char* buff);
 char* get_all_key_words_in_one_string(player_t *player);
-int does_keyword_match(char* keyword, player_t* player);
+int does_keyword_match(char* keyword, player_t* other_player);
 void free_player_set(player_set_t* player_set);
