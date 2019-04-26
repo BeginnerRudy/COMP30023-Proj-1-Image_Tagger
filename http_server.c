@@ -93,7 +93,6 @@ void initialise_fd_set(fd_set *masterfds, int* maxfd, int welcoming_sockfd){
       *maxfd = welcoming_sockfd;
 }
 void handle_connection_request(int welcoming_sockfd, fd_set* masterfds, int* maxfd){
-      printf("welcoming_sockfd get active\n");
       struct sockaddr_in cliaddr;
       socklen_t clilen = sizeof(cliaddr);
       int newsockfd = accept(welcoming_sockfd, (struct sockaddr *)&cliaddr, &clilen);
@@ -106,23 +105,21 @@ void handle_connection_request(int welcoming_sockfd, fd_set* masterfds, int* max
           if (newsockfd > *maxfd)
               *maxfd = newsockfd;
           // print out the IP and the socket number
-          char ip[INET_ADDRSTRLEN];
-          printf(
-              "player %d connected from %s\n",
-              // convert to human readable string
-              newsockfd,
-              inet_ntop(cliaddr.sin_family, &cliaddr.sin_addr, ip, INET_ADDRSTRLEN)
-
-          );
+          // char ip[INET_ADDRSTRLEN];
+          // printf(
+          //     "player %d connected from %s\n",
+          //     // convert to human readable string
+          //     newsockfd,
+          //     inet_ntop(cliaddr.sin_family, &cliaddr.sin_addr, ip, INET_ADDRSTRLEN)
+          //
+          // );
       }
 }
 void handle_all_incoming_request(fd_set masterfds, int *maxfd,
     int welcoming_sockfd, player_set_t* player_set){
-      int count = 1;
       game_info_t* game_info = create_game_info();
       while (1)
       {
-        printf("++++++++++++++++++++++++++++Loop %d+++++++++++++++++++++++++\n", count++);
           // monitor file descriptors
           fd_set readfds = masterfds;
           if (select(FD_SETSIZE, &readfds, NULL, NULL, NULL) < 0)

@@ -79,7 +79,6 @@ void print_game_info(game_info_t* game_info){
 
 void clear_player_game_info(game_info_t* game_info, int cookie_id){
     player_t** curr_player = get_current_player(game_info, cookie_id);
-    printf("clear game info for cookie %d\n", cookie_id);
     // clear keywords, and set keyword count to 0;
     clear_player_keywords(*curr_player);
     // make curr_player point to NULL, to indicate no player
