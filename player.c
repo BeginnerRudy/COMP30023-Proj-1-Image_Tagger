@@ -91,6 +91,12 @@ void print_all_cookies(player_set_t* player_set){
     }
     printf("Print all player successfully\n");
 }
+
+void print_player(player_t* player){
+    printf("Player name is %s\n", player->username);
+    printf("Player cookie is %d\n", player->cookie);
+}
+
 int does_contain_cookie(char* buff, player_set_t* player_set){
     if (strstr(buff, "Cookie: ") != NULL &&
     is_valid_cookie(player_set, atoi(get_cookie(buff)))){
@@ -122,6 +128,15 @@ char* get_cookie(char* buff){
     return NULL;
 }
 
+// Assume the cookie id is valid, that is it has already be bind to one player
+player_t* get_player_by_cookie(player_set_t* player_set, int cookie_id){
+    for (int i = 0; i < player_set->curr_size; i++){
+        if (player_set->players[i].cookie == cookie_id){
+            return &player_set->players[i];
+        }
+    }
+    return NULL;
+}
 
 char* parse_and_format_keyword(char* buff){
     char* curr = strstr(buff, "keyword=") + 8;

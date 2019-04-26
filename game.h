@@ -7,7 +7,10 @@ typedef struct{
     int is_game_over;// 0 for not game over, otherwise game end
 }game_info_t;
 
+game_info_t* create_game_info();
 void set_game_over(int* is_game_over, int value);
 void set_game_end(int* is_game_end, int value);
-player_t* get_null_player(game_info_t* game_info);
+player_t** get_null_player(game_info_t* game_info);
 player_t* get_another_player(game_info_t* game_info, int cookie_id);
+void register_into_game(game_info_t* game_info, player_t* curr_player);
+void print_game_info(game_info_t* game_info);

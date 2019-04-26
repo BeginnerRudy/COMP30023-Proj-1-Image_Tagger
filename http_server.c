@@ -119,8 +119,7 @@ void handle_connection_request(int welcoming_sockfd, fd_set* masterfds, int* max
 void handle_all_incoming_request(fd_set masterfds, int *maxfd,
     int welcoming_sockfd, player_set_t* player_set){
       int count = 1;
-      //TODO player1 player2
-      //TODO is_game_end, is_game_over
+      game_info_t* game_info = create_game_info();
       while (1)
       {
         printf("++++++++++++++++++++++++++++Loop %d+++++++++++++++++++++++++\n", count++);
@@ -142,7 +141,7 @@ void handle_all_incoming_request(fd_set masterfds, int *maxfd,
                     handle_connection_request(welcoming_sockfd, &masterfds, maxfd);
                   }
                   // a request is sent from the client
-                  else if (!handle_http_request(i, player_set))
+                  else if (!handle_http_request(i, player_set, game_info))
                   {
                       close(i);
                       FD_CLR(i, &masterfds);
