@@ -9,21 +9,21 @@ $(EXE): $(OBJ)
 	$(CC) $(CFLAGS) -o $(EXE) $(OBJ)
 
 
-response.o: response.c response.h
+response.o: response.c 
 	$(CC) $(CFLAGS) -c response.c
 
-player.o: player.c player.h
-	$(CC) $(CFLAGS) -c player.c player.h
-game.o: game.c game.h player.o
-	$(CC) $(CFLAGS) -c game.c game.h
+player.o: player.c 
+	$(CC) $(CFLAGS) -c player.c 
+game.o: game.c  
+	$(CC) $(CFLAGS) -c game.c
 
-handle_http_request.o: handle_http_request.c handle_http_request.h html_pages.h game.o response.o
+handle_http_request.o: handle_http_request.c
 	$(CC) $(CFLAGS) -c handle_http_request.c
 
-main.o: main.c handle_http_request.o html_pages.h
+main.o: main.c 
 	$(CC) $(CFLAGS) -c main.c
 
-http_server.o: http_server.c http_server.h
+http_server.o: http_server.c
 	$(CC) $(CFLAGS) -c http_server.c
 
 
